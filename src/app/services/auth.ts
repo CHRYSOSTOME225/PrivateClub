@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -6,17 +8,18 @@ import { Injectable } from '@angular/core';
 export class Auth {
 
   private connecte = false;
-
   private role = '';
-
   private nom = '';
 
+  private apiUrl =
+    'http://localhost:3000/api/connexion';
 
-  constructor() {
+  constructor(private http: HttpClient) {
 
     const utilisateur =
-      localStorage.getItem('utilisateurConnecte');
-
+      localStorage.getItem(
+        'utilisateurConnecte'
+      );
 
     if (utilisateur) {
 
@@ -31,46 +34,81 @@ export class Auth {
 
       this.nom =
         donnees.nom;
-
     }
-
   }
-
 
   estConnecte() {
-
     return this.connecte;
-
   }
-
 
   connecter(
-    nom: string,
-    role: string
-  ) {
+    email: string,
+    motDePasse: string
+  ): Observable<any> {
 
-    this.connecte = true;
+    return this.http.post<any>(
+      this.apiUrl,
+      {
+        email: email,
+        motDePasse: motDePasse
+      }
+    ).pipe(
 
-    this.nom = nom;
+      tap((reponse) => {
 
-    this.role = role;
+        this.connecte = true;
 
+        this.nom =
+          reponse.utilisateur.nom;
 
-    localStorage.setItem(
-      'utilisateurConnecte',
-      JSON.stringify({
+        this.role =
+          reponse.utilisateur.role;
 
-        connecte: true,
+        // Enregistrer le JWT
+        localStorage.setItem(
+          'token',
+          reponse.token
+        );
 
-        nom: nom,
+        // Enregistrer les informations
+        // de l'utilisateur
+        localStorage.setItem(
+          'utilisateurConnecte',
+          JSON.stringify({
 
-        role: role
+            connecte: true,
+
+            id:
+              reponse.utilisateur.id,
+
+            nom:
+              reponse.utilisateur.nom,
+
+            email:
+              reponse.utilisateur.email,
+
+            role:
+              reponse.utilisateur.role,
+
+            departement:
+              reponse.utilisateur.departement,
+
+            poste:
+              reponse.utilisateur.poste,
+
+            telephone:
+              reponse.utilisateur.telephone,
+
+            photo:
+              reponse.utilisateur.photo
+
+          })
+        );
 
       })
+
     );
-
   }
-
 
   deconnecter() {
 
@@ -80,25 +118,22 @@ export class Auth {
 
     this.role = '';
 
-
     localStorage.removeItem(
       'utilisateurConnecte'
     );
 
+    // Supprimer également le JWT
+    localStorage.removeItem(
+      'token'
+    );
   }
-
 
   getRole() {
-
     return this.role;
-
   }
 
-
   getNom() {
-
     return this.nom;
-
   }
 
 }

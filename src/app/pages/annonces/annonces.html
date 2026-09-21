@@ -1,4 +1,3 @@
-```html
 <div class="annonces-page">
 
   <header class="topbar">
@@ -16,6 +15,15 @@
     <h1>Les annonces</h1>
 
     <p>Découvrez les annonces publiées sur PrivateClub.</p>
+
+
+    @if (message !== '') {
+
+      <div class="message">
+        {{ message }}
+      </div>
+
+    }
 
 
     @if (roleUtilisateur === 'Admin' || roleUtilisateur === 'Responsable') {
@@ -49,13 +57,21 @@
       <div class="publication-form">
 
         <div class="form-header">
+
           <div>
-            <span class="form-label">NOUVELLE PUBLICATION</span>
+            <span class="form-label">
+              NOUVELLE PUBLICATION
+            </span>
+
             <h2>Publier une annonce</h2>
           </div>
 
-          <span class="form-icon">✦</span>
+          <span class="form-icon">
+            ✦
+          </span>
+
         </div>
+
 
         <input
           type="text"
@@ -63,10 +79,12 @@
           [(ngModel)]="nouveauTitre"
         >
 
+
         <textarea
           placeholder="Écrivez le contenu de votre annonce..."
           [(ngModel)]="nouveauContenu"
         ></textarea>
+
 
         <div class="form-actions">
 
@@ -77,6 +95,7 @@
             Annuler
 
           </button>
+
 
           <button
             class="submit-button"
@@ -93,38 +112,65 @@
     }
 
 
-    @for (annonce of annonces; track $index) {
+    @for (annonce of annonces; track annonce.id) {
 
       <div class="annonce-card">
 
-        <h2>{{ annonce.titre }}</h2>
+        <h2>
+          {{ annonce.titre }}
+        </h2>
+
 
         <p>
           {{ annonce.contenu }}
         </p>
 
+
         <span>
-          Publié par {{ annonce.auteur }} — {{ annonce.date }}
+          Publié par {{ annonce.auteur }}
+          —
+          {{ annonce.date_creation | date:'dd MMMM yyyy' }}
         </span>
-        
+
+
         @if (
-  roleUtilisateur === 'Admin' ||
-  (roleUtilisateur === 'Responsable' && annonce.auteur === auth.getNom())
-) {
+          roleUtilisateur === 'Admin' ||
+          (
+            roleUtilisateur === 'Responsable' &&
+            annonce.auteur === auth.getNom()
+          )
+        ) {
 
-  <button
-    class="delete-button"
-    (click)="supprimerAnnonce($index)">
-    🗑️ Supprimer
-  </button>
+          <button
+            class="delete-button"
+            (click)="supprimerAnnonce(annonce.id)">
 
-}
+            🗑️ Supprimer
+
+          </button>
+
+        }
 
       </div>
 
     }
 
+
+    @if (annonces.length === 0) {
+
+      <div class="no-annonces">
+
+        <h2>Aucune annonce</h2>
+
+        <p>
+          Aucune annonce n'a encore été publiée.
+        </p>
+
+      </div>
+
+    }
+
+
   </main>
 
 </div>
-```

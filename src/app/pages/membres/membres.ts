@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { Auth } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-membres',
@@ -11,32 +12,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class Membres {
 
-  membres = [
-    {
-      nom: 'Jean Kouadio',
-      role: 'Admin',
-      departement: 'Informatique',
-      email: 'jean@privateclub.com'
-    },
-    {
-      nom: 'Marie Yao',
-      role: 'Responsable',
-      departement: 'Communication',
-      email: 'marie@privateclub.com'
-    },
-    {
-      nom: 'Paul Koffi',
-      role: 'Membre',
-      departement: 'Informatique',
-      email: 'paul@privateclub.com'
-    },
-    {
-      nom: 'Aïcha Traoré',
-      role: 'Membre',
-      departement: 'Marketing',
-      email: 'aicha@privateclub.com'
-    }
-  ];
+  membres: any[] = [];
 
   recherche = '';
 
@@ -44,35 +20,69 @@ export class Membres {
 
   nomUtilisateur = '';
 
-
   constructor(
     private router: Router,
-    private auth: Auth
+    private auth: Auth,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
-
 
   ngOnInit() {
 
-    this.roleUtilisateur =
-      this.auth.getRole();
+    console.log('PAGE MEMBRES CHARGÉE');
 
-    this.nomUtilisateur =
-      this.auth.getNom();
+    this.roleUtilisateur = this.auth.getRole();
 
+    this.nomUtilisateur = this.auth.getNom();
 
-    const membresSauvegardes =
-      localStorage.getItem('membres');
+    console.log('ROLE :', this.roleUtilisateur);
+    console.log('NOM :', this.nomUtilisateur);
 
-
-    if (membresSauvegardes) {
-
-      this.membres =
-        JSON.parse(membresSauvegardes);
-
-    }
+    this.chargerMembres();
 
   }
 
+  chargerMembres() {
+
+    console.log('CHARGEMENT DES MEMBRES...');
+
+    this.http
+      .get<any[]>(
+        'http://localhost:3000/api/utilisateurs'
+      )
+      .subscribe({
+
+        next: (resultats) => {
+
+          console.log(
+            'MEMBRES REÇUS DE MYSQL :',
+            resultats
+          );
+
+          this.membres = resultats;
+
+          console.log(
+            'MEMBRES DANS LE TABLEAU :',
+            this.membres
+          );
+
+          // Force Angular à actualiser l'affichage
+          this.cdr.detectChanges();
+
+        },
+
+        error: (erreur) => {
+
+          console.error(
+            'ERREUR API MEMBRES :',
+            erreur
+          );
+
+        }
+
+      });
+
+  }
 
   get membresFiltres() {
 
@@ -81,13 +91,11 @@ export class Membres {
         .toLowerCase()
         .trim();
 
-
     if (texte === '') {
 
       return this.membres;
 
     }
-
 
     return this.membres.filter(membre =>
 
@@ -103,7 +111,7 @@ export class Membres {
 
       ||
 
-      membre.departement
+      (membre.departement || '')
         .toLowerCase()
         .includes(texte)
 
@@ -111,10 +119,7 @@ export class Membres {
 
   }
 
-
-  peutEnvoyerMessage(
-    membre: any
-  ): boolean {
+  peutEnvoyerMessage(membre: any): boolean {
 
     if (
       membre.nom === this.nomUtilisateur
@@ -124,7 +129,6 @@ export class Membres {
 
     }
 
-
     if (
       this.roleUtilisateur === 'Admin'
     ) {
@@ -133,41 +137,33 @@ export class Membres {
 
     }
 
-
     if (
       this.roleUtilisateur === 'Responsable'
     ) {
 
-      return true;
+      return (
+        membre.role === 'Admin' ||
+        membre.role === 'Membre'
+      );
 
     }
-
 
     if (
       this.roleUtilisateur === 'Membre'
     ) {
 
       return (
-
-        membre.role === 'Membre'
-
-        ||
-
+        membre.role === 'Membre' ||
         membre.role === 'Responsable'
-
       );
 
     }
-
 
     return false;
 
   }
 
-
-  ouvrirMessagerie(
-    nom: string
-  ) {
+  ouvrirMessagerie(nom: string) {
 
     this.router.navigate(
       ['/messagerie'],
@@ -179,7 +175,6 @@ export class Membres {
     );
 
   }
-
 
   retourDashboard() {
 

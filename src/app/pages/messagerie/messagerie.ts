@@ -1,11 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef
+} from '@angular/core';
+
+import { DatePipe } from '@angular/common';
+
+import {
+  Router,
+  ActivatedRoute
+} from '@angular/router';
+
 import { FormsModule } from '@angular/forms';
+
+import { HttpClient } from '@angular/common/http';
+
 import { Auth } from '../../services/auth';
+
 
 @Component({
   selector: 'app-messagerie',
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe],
   templateUrl: './messagerie.html',
   styleUrl: './messagerie.css'
 })
@@ -17,45 +32,32 @@ export class Messagerie implements OnInit {
 
   nomUtilisateur = '';
 
+  idUtilisateur = 0;
+
   recherche = '';
 
   nouveauMessage = '';
 
+  membres: any[] = [];
 
-  membres = [
-    {
-      nom: 'Jean Kouadio',
-      role: 'Admin'
-    },
-    {
-      nom: 'Marie Yao',
-      role: 'Responsable'
-    },
-    {
-      nom: 'Paul Koffi',
-      role: 'Membre'
-    },
-    {
-      nom: 'Aïcha Traoré',
-      role: 'Membre'
-    }
-  ];
+  messages: any[] = [];
+
+  messageErreur = '';
 
 
-  messagesParMembre: {
-    [nom: string]: {
-      texte: string;
-      expediteur: string;
-      destinataire: string;
-      heure: string;
-    }[];
-  } = {};
+  private apiUtilisateurs =
+    'http://localhost:3000/api/utilisateurs';
+
+  private apiMessages =
+    'http://localhost:3000/api/messages';
 
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private auth: Auth
+    private auth: Auth,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
 
 
@@ -68,42 +70,95 @@ export class Messagerie implements OnInit {
       this.auth.getNom();
 
 
-    const membresSauvegardes =
-      localStorage.getItem('membres');
+    const utilisateur =
+      localStorage.getItem(
+        'utilisateurConnecte'
+      );
 
 
-    if (membresSauvegardes) {
+    if (utilisateur) {
 
-      this.membres =
-        JSON.parse(membresSauvegardes);
+      const donnees =
+        JSON.parse(utilisateur);
 
-    }
-
-
-    const messagesSauvegardes =
-      localStorage.getItem('messages');
-
-
-    if (messagesSauvegardes) {
-
-      this.messagesParMembre =
-        JSON.parse(messagesSauvegardes);
+      this.idUtilisateur =
+        donnees.id;
 
     }
 
 
+    // Lire le membre sélectionné dans l'URL
     this.route.queryParams.subscribe(
       params => {
 
-        this.membreSelectionne =
-          params['membre'] || '';
+        const membre =
+          params['membre'];
+
+        if (membre) {
+
+          this.membreSelectionne =
+            membre;
+
+        }
+
+        this.chargerMessages();
 
       }
     );
 
+
+    this.chargerMembres();
+
   }
 
 
+  // Charger les membres
+  chargerMembres() {
+
+    this.http
+      .get<any[]>(
+        this.apiUtilisateurs
+      )
+      .subscribe({
+
+        next: (resultats) => {
+
+          this.membres =
+            resultats;
+
+          this.cdr.detectChanges();
+
+
+          // Charger la conversation
+          // une fois les membres disponibles
+          if (
+            this.membreSelectionne
+          ) {
+
+            this.chargerMessages();
+
+          }
+
+        },
+
+        error: (erreur) => {
+
+          console.error(
+            'ERREUR MEMBRES :',
+            erreur
+          );
+
+          this.messageErreur =
+            'Impossible de charger les membres.';
+
+        }
+
+      });
+
+  }
+
+
+  // Filtrer les membres
   get membresFiltres() {
 
     const texte =
@@ -137,20 +192,44 @@ export class Messagerie implements OnInit {
   }
 
 
+  // Sélectionner un membre
   selectionnerMembre(
     nom: string
   ) {
 
-    if (!this.peutContacter(nom)) {
+    console.log(
+      'MEMBRE CLIQUÉ :',
+      nom
+    );
+
+
+    if (
+      !this.peutContacter(nom)
+    ) {
+
+      console.log(
+        'CONTACT NON AUTORISÉ'
+      );
 
       return;
 
     }
 
 
-    this.membreSelectionne = nom;
+    // Sélection immédiate
+    this.membreSelectionne =
+      nom;
+
+    this.nouveauMessage =
+      '';
+
+    this.messageErreur =
+      '';
+
+    this.messages = [];
 
 
+    // Mettre le membre dans l'URL
     this.router.navigate(
       ['/messagerie'],
       {
@@ -160,13 +239,22 @@ export class Messagerie implements OnInit {
       }
     );
 
+
+    // Charger les messages
+    this.chargerMessages();
+
+
+    this.cdr.detectChanges();
+
   }
 
 
+  // Vérifier les droits
   peutContacter(
     nom: string
   ): boolean {
 
+    // Ne pas pouvoir se contacter soi-même
     if (
       nom === this.nomUtilisateur
     ) {
@@ -178,7 +266,8 @@ export class Messagerie implements OnInit {
 
     const membre =
       this.membres.find(
-        m => m.nom === nom
+        m =>
+          m.nom === nom
       );
 
 
@@ -189,10 +278,9 @@ export class Messagerie implements OnInit {
     }
 
 
+    // ADMIN
     if (
       this.roleUtilisateur === 'Admin'
-      ||
-      this.roleUtilisateur === 'Responsable'
     ) {
 
       return true;
@@ -200,18 +288,27 @@ export class Messagerie implements OnInit {
     }
 
 
+    // RESPONSABLE
+    if (
+      this.roleUtilisateur === 'Responsable'
+    ) {
+
+      return (
+        membre.role === 'Admin' ||
+        membre.role === 'Membre'
+      );
+
+    }
+
+
+    // MEMBRE
     if (
       this.roleUtilisateur === 'Membre'
     ) {
 
       return (
-
+        membre.role === 'Responsable' ||
         membre.role === 'Membre'
-
-        ||
-
-        membre.role === 'Responsable'
-
       );
 
     }
@@ -222,17 +319,78 @@ export class Messagerie implements OnInit {
   }
 
 
+  // Charger les messages
+  chargerMessages() {
+
+    if (
+      !this.membreSelectionne ||
+      !this.idUtilisateur
+    ) {
+
+      return;
+
+    }
+
+
+    const membre =
+      this.membres.find(
+        m =>
+          m.nom ===
+          this.membreSelectionne
+      );
+
+
+    if (!membre) {
+
+      return;
+
+    }
+
+
+    console.log(
+      'CHARGEMENT CONVERSATION AVEC :',
+      membre.nom
+    );
+
+
+    this.http
+      .get<any[]>(
+        `${this.apiMessages}/${this.idUtilisateur}/${membre.id}`
+      )
+      .subscribe({
+
+        next: (resultats) => {
+
+          this.messages =
+            resultats;
+
+          this.cdr.detectChanges();
+
+        },
+
+        error: (erreur) => {
+
+          console.error(
+            'ERREUR MESSAGES :',
+            erreur
+          );
+
+          this.messageErreur =
+            'Impossible de charger les messages.';
+
+        }
+
+      });
+
+  }
+
+
+  // Envoyer un message
   envoyerMessage() {
 
     if (
-
-      !this.membreSelectionne
-
-      ||
-
-      this.nouveauMessage
-        .trim() === ''
-
+      !this.membreSelectionne ||
+      this.nouveauMessage.trim() === ''
     ) {
 
       return;
@@ -251,65 +409,72 @@ export class Messagerie implements OnInit {
     }
 
 
-    if (
-      !this.messagesParMembre[
-        this.membreSelectionne
-      ]
-    ) {
+    const membre =
+      this.membres.find(
+        m =>
+          m.nom ===
+          this.membreSelectionne
+      );
 
-      this.messagesParMembre[
-        this.membreSelectionne
-      ] = [];
+
+    if (!membre) {
+
+      return;
 
     }
 
 
-    const maintenant =
-      new Date();
+    const donnees = {
+
+      expediteur_id:
+        this.idUtilisateur,
+
+      destinataire_id:
+        membre.id,
+
+      contenu:
+        this.nouveauMessage.trim()
+
+    };
 
 
-    const heure =
-      maintenant.toLocaleTimeString(
-        'fr-FR',
-        {
-          hour: '2-digit',
-          minute: '2-digit'
-        }
-      );
-
-
-    this.messagesParMembre[
-      this.membreSelectionne
-    ].push({
-
-      texte:
-        this.nouveauMessage.trim(),
-
-      expediteur:
-        this.nomUtilisateur || 'Moi',
-
-      destinataire:
-        this.membreSelectionne,
-
-      heure:
-        heure
-
-    });
-
-
-    localStorage.setItem(
-      'messages',
-      JSON.stringify(
-        this.messagesParMembre
+    this.http
+      .post(
+        this.apiMessages,
+        donnees
       )
-    );
+      .subscribe({
 
+        next: () => {
 
-    this.nouveauMessage = '';
+          this.nouveauMessage =
+            '';
+
+          this.messageErreur =
+            '';
+
+          this.chargerMessages();
+
+        },
+
+        error: (erreur) => {
+
+          console.error(
+            'ERREUR ENVOI MESSAGE :',
+            erreur
+          );
+
+          this.messageErreur =
+            "Erreur lors de l'envoi du message.";
+
+        }
+
+      });
 
   }
 
 
+  // Retour dashboard
   retourDashboard() {
 
     this.router.navigate(

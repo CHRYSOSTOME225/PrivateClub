@@ -10,10 +10,9 @@
 
     <button
       class="back-button"
-      (click)="retourDashboard()">
-
+      (click)="retourDashboard()"
+    >
       Retour au Dashboard
-
     </button>
 
   </header>
@@ -39,9 +38,13 @@
 
       <div class="member-count">
 
-        <strong>{{ membresFiltres.length }}</strong>
+        <strong>
+          {{ membresFiltres.length }}
+        </strong>
 
-        <span>membre(s)</span>
+        <span>
+          membre(s)
+        </span>
 
       </div>
 
@@ -50,7 +53,9 @@
 
     <div class="search-box">
 
-      <span class="search-icon">🔎</span>
+      <span class="search-icon">
+        🔎
+      </span>
 
       <input
         type="text"
@@ -62,28 +67,28 @@
 
 
     <section class="members-list">
-
-      @for (membre of membresFiltres; track membre.nom) {
+      
+      @for (membre of membresFiltres; track membre.id) {
 
         <div class="member-card">
 
           <div class="avatar">
-
             {{ membre.nom.charAt(0) }}
-
           </div>
 
 
           <div class="member-info">
 
-            <h2>{{ membre.nom }}</h2>
+            <h2>
+              {{ membre.nom }}
+            </h2>
 
             <span class="role">
               {{ membre.role }}
             </span>
 
             <p>
-              🏢 {{ membre.departement }}
+              🏢 {{ membre.departement || 'Non renseigné' }}
             </p>
 
             <p>
@@ -99,21 +104,16 @@
 
               <button
                 class="message-button"
-                (click)="ouvrirMessagerie(membre.nom)">
-
+                (click)="ouvrirMessagerie(membre.nom)"
+              >
                 💬 Message
-
               </button>
 
-            } @else {
+            } @else if (membre.nom === nomUtilisateur) {
 
-              @if (membre.nom === nomUtilisateur) {
-
-                <span class="current-user">
-                  Vous
-                </span>
-
-              }
+              <span class="current-user">
+                Vous
+              </span>
 
             }
 
@@ -128,9 +128,13 @@
 
         <div class="no-result">
 
-          <div>🔎</div>
+          <div>
+            🔎
+          </div>
 
-          <h2>Aucun membre trouvé</h2>
+          <h2>
+            Aucun membre trouvé
+          </h2>
 
           <p>
             Essayez avec un autre nom, rôle ou département.

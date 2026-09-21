@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Auth } from '../../services/auth';
 
 @Component({
@@ -11,40 +12,7 @@ import { Auth } from '../../services/auth';
 })
 export class Administration {
 
-  membres = [
-    {
-      nom: 'Jean Kouadio',
-      role: 'Admin',
-      departement: 'Informatique',
-      email: 'jean@privateclub.com',
-      identifiant: 'admin',
-      motDePasse: '1234'
-    },
-    {
-      nom: 'Marie Yao',
-      role: 'Responsable',
-      departement: 'Communication',
-      email: 'marie@privateclub.com',
-      identifiant: 'marie',
-      motDePasse: '1234'
-    },
-    {
-      nom: 'Paul Koffi',
-      role: 'Membre',
-      departement: 'Informatique',
-      email: 'paul@privateclub.com',
-      identifiant: 'paul',
-      motDePasse: '1234'
-    },
-    {
-      nom: 'Aïcha Traoré',
-      role: 'Membre',
-      departement: 'Marketing',
-      email: 'aicha@privateclub.com',
-      identifiant: 'aicha',
-      motDePasse: '1234'
-    }
-  ];
+  membres: any[] = [];
 
   recherche = '';
 
@@ -52,7 +20,7 @@ export class Administration {
 
   modeModification = false;
 
-  membreModifieIndex = -1;
+  membreModifieId: number | null = null;
 
   nouveauNom = '';
 
@@ -70,12 +38,12 @@ export class Administration {
 
   message = '';
 
-
   constructor(
     private router: Router,
-    private auth: Auth
+    private auth: Auth,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
-
 
   ngOnInit() {
 
@@ -87,37 +55,59 @@ export class Administration {
 
     }
 
-
-    const membresSauvegardes =
-      localStorage.getItem('membres');
-
-
-    if (membresSauvegardes) {
-
-      this.membres =
-        JSON.parse(membresSauvegardes);
-
-    } else {
-
-      this.sauvegarderMembres();
-
-    }
+    this.chargerMembres();
 
   }
 
+  chargerMembres() {
+
+    this.http
+      .get<any[]>(
+        'http://localhost:3000/api/utilisateurs'
+      )
+      .subscribe({
+
+        next: (resultats) => {
+
+          this.membres = resultats;
+
+          console.log(
+            'MEMBRES ADMINISTRATION :',
+            this.membres
+          );
+
+          this.cdr.detectChanges();
+
+        },
+
+        error: (erreur) => {
+
+          console.error(
+            'ERREUR CHARGEMENT MEMBRES :',
+            erreur
+          );
+
+          this.message =
+            'Impossible de charger les membres.';
+
+        }
+
+      });
+
+  }
 
   get membresFiltres() {
 
     const texte =
-      this.recherche.toLowerCase().trim();
-
+      this.recherche
+        .toLowerCase()
+        .trim();
 
     if (texte === '') {
 
       return this.membres;
 
     }
-
 
     return this.membres.filter(membre =>
 
@@ -133,7 +123,7 @@ export class Administration {
 
       ||
 
-      membre.departement
+      (membre.departement || '')
         .toLowerCase()
         .includes(texte)
 
@@ -143,22 +133,15 @@ export class Administration {
         .toLowerCase()
         .includes(texte)
 
-      ||
-
-      (membre.identifiant || '')
-        .toLowerCase()
-        .includes(texte)
-
     );
 
   }
-
 
   ouvrirAjout() {
 
     this.modeModification = false;
 
-    this.membreModifieIndex = -1;
+    this.membreModifieId = null;
 
     this.nouveauNom = '';
 
@@ -180,25 +163,11 @@ export class Administration {
 
   }
 
-
   ouvrirModification(membre: any) {
-
-    this.afficherMotDePasse = false;
-
-    const index =
-      this.membres.indexOf(membre);
-
-
-    if (index === -1) {
-
-      return;
-
-    }
-
 
     this.modeModification = true;
 
-    this.membreModifieIndex = index;
+    this.membreModifieId = membre.id;
 
     this.nouveauNom =
       membre.nom;
@@ -207,16 +176,17 @@ export class Administration {
       membre.role;
 
     this.nouveauDepartement =
-      membre.departement;
+      membre.departement || '';
 
     this.nouvelEmail =
       membre.email;
 
     this.nouvelIdentifiant =
-      membre.identifiant || '';
+      membre.email;
 
-    this.nouveauMotDePasse =
-      membre.motDePasse || '';
+    this.nouveauMotDePasse = '';
+
+    this.afficherMotDePasse = false;
 
     this.message = '';
 
@@ -226,31 +196,17 @@ export class Administration {
 
   basculerMotDePasse() {
 
-  this.afficherMotDePasse =
-    !this.afficherMotDePasse;
+    this.afficherMotDePasse =
+      !this.afficherMotDePasse;
 
-}
-
+  }
 
   enregistrerMembre() {
 
     if (
-      this.nouveauNom.trim() === ''
-
-      ||
-
-      this.nouveauDepartement.trim() === ''
-
-      ||
-
-      this.nouvelEmail.trim() === ''
-
-      ||
-
-      this.nouvelIdentifiant.trim() === ''
-
-      ||
-
+      this.nouveauNom.trim() === '' ||
+      this.nouveauDepartement.trim() === '' ||
+      this.nouvelEmail.trim() === '' ||
       this.nouveauMotDePasse.trim() === ''
     ) {
 
@@ -261,74 +217,88 @@ export class Administration {
 
     }
 
-
-    const identifiantExiste =
-      this.membres.some(
-        (membre, index) =>
-
-          membre.identifiant ===
-          this.nouvelIdentifiant.trim()
-
-          &&
-
-          index !== this.membreModifieIndex
-      );
-
-
-    if (identifiantExiste) {
-
-      this.message =
-        'Cet identifiant est déjà utilisé.';
-
-      return;
-
-    }
-
-
-    const membre = {
+    const donnees = {
 
       nom:
         this.nouveauNom.trim(),
+
+      email:
+        this.nouvelEmail.trim(),
+
+      motDePasse:
+        this.nouveauMotDePasse.trim(),
 
       role:
         this.nouveauRole,
 
       departement:
-        this.nouveauDepartement.trim(),
-
-      email:
-        this.nouvelEmail.trim(),
-
-      identifiant:
-        this.nouvelIdentifiant.trim(),
-
-      motDePasse:
-        this.nouveauMotDePasse.trim()
+        this.nouveauDepartement.trim()
 
     };
 
-
     if (this.modeModification) {
 
-      this.membres[
-        this.membreModifieIndex
-      ] = membre;
+      this.http
+        .put(
+          `http://localhost:3000/api/utilisateurs/${this.membreModifieId}`,
+          donnees
+        )
+        .subscribe({
+
+          next: () => {
+
+            this.formulaireVisible = false;
+
+            this.message = '';
+
+            this.chargerMembres();
+
+          },
+
+          error: (erreur) => {
+
+            console.error(erreur);
+
+            this.message =
+              'Erreur lors de la modification.';
+
+          }
+
+        });
 
     } else {
 
-      this.membres.push(membre);
+      this.http
+        .post(
+          'http://localhost:3000/api/utilisateurs',
+          donnees
+        )
+        .subscribe({
+
+          next: () => {
+
+            this.formulaireVisible = false;
+
+            this.message = '';
+
+            this.chargerMembres();
+
+          },
+
+          error: (erreur) => {
+
+            console.error(erreur);
+
+            this.message =
+              'Erreur lors de la création du membre.';
+
+          }
+
+        });
 
     }
 
-
-    this.sauvegarderMembres();
-
-    this.formulaireVisible = false;
-
-    this.message = '';
-
   }
-
 
   supprimerMembre(membre: any) {
 
@@ -341,34 +311,43 @@ export class Administration {
 
     }
 
+    const confirmation =
+      confirm(
+        `Voulez-vous supprimer ${membre.nom} ?`
+      );
 
-    const index =
-      this.membres.indexOf(membre);
-
-
-    if (index === -1) {
+    if (!confirmation) {
 
       return;
 
     }
 
+    this.http
+      .delete(
+        `http://localhost:3000/api/utilisateurs/${membre.id}`
+      )
+      .subscribe({
 
-    this.membres.splice(index, 1);
+        next: () => {
 
-    this.sauvegarderMembres();
+          this.message = '';
+
+          this.chargerMembres();
+
+        },
+
+        error: (erreur) => {
+
+          console.error(erreur);
+
+          this.message =
+            'Erreur lors de la suppression.';
+
+        }
+
+      });
 
   }
-
-
-  sauvegarderMembres() {
-
-    localStorage.setItem(
-      'membres',
-      JSON.stringify(this.membres)
-    );
-
-  }
-
 
   fermerFormulaire() {
 
@@ -378,10 +357,11 @@ export class Administration {
 
   }
 
-
   retourDashboard() {
 
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(
+      ['/dashboard']
+    );
 
   }
 

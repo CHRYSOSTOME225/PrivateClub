@@ -58,7 +58,7 @@
 
         @for (
           membre of membresFiltres;
-          track membre.nom
+          track membre.id
         ) {
 
           @if (peutContacter(membre.nom)) {
@@ -75,6 +75,7 @@
                 {{ membre.nom.charAt(0) }}
               </div>
 
+
               <div class="member-details">
 
                 <strong>
@@ -86,6 +87,7 @@
                 </span>
 
               </div>
+
 
               <span class="arrow">
                 ›
@@ -135,10 +137,17 @@
 
         <div class="message-area">
 
-          @if (
-            !messagesParMembre[membreSelectionne] ||
-            messagesParMembre[membreSelectionne].length === 0
-          ) {
+
+          @if (messageErreur !== '') {
+
+            <div class="message-error">
+              {{ messageErreur }}
+            </div>
+
+          }
+
+
+          @if (messages.length === 0) {
 
             <div class="empty-conversation">
 
@@ -160,14 +169,14 @@
           } @else {
 
             @for (
-              message of messagesParMembre[membreSelectionne];
-              track $index
+              message of messages;
+              track message.id
             ) {
 
               <div
                 class="message"
                 [class.my-message]="
-                  message.expediteur === nomUtilisateur
+                  message.expediteur_id === idUtilisateur
                 "
               >
 
@@ -178,13 +187,13 @@
                   </strong>
 
                   <span>
-                    {{ message.heure }}
+                    {{ message.date_envoi | date:'HH:mm' }}
                   </span>
 
                 </div>
 
                 <p>
-                  {{ message.texte }}
+                  {{ message.contenu }}
                 </p>
 
               </div>

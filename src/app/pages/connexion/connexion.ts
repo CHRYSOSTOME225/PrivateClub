@@ -17,12 +17,10 @@ export class Connexion {
 
   message = '';
 
-
   constructor(
     private router: Router,
     private auth: Auth
   ) {}
-
 
   seConnecter() {
 
@@ -38,140 +36,40 @@ export class Connexion {
 
     }
 
+    this.auth
+      .connecter(
+        this.nom.trim(),
+        this.motDePasse
+      )
+      .subscribe({
 
-    let membres = [];
+        next: () => {
 
-    const membresSauvegardes =
-      localStorage.getItem('membres');
+          this.message = '';
 
+          this.router.navigate(
+            ['/dashboard']
+          );
 
-    if (membresSauvegardes) {
+        },
 
-      membres =
-        JSON.parse(membresSauvegardes);
+        error: (erreur) => {
 
-    }
+          if (erreur.status === 401) {
 
+            this.message =
+              'Email ou mot de passe incorrect.';
 
-    /*
-      COMPATIBILITÉ AVEC LES ANCIENS MEMBRES
+          } else {
 
-      Si l'ancien Admin existe sans identifiant
-      ni mot de passe, on lui ajoute automatiquement
-      ses informations de connexion.
-    */
+            this.message =
+              'Erreur de connexion au serveur.';
 
-    membres = membres.map(
-      (membre: any) => {
-
-        if (
-          membre.nom === 'Jean Kouadio' &&
-          membre.role === 'Admin'
-        ) {
-
-          return {
-            ...membre,
-            identifiant:
-              membre.identifiant || 'admin',
-            motDePasse:
-              membre.motDePasse || '1234'
-          };
+          }
 
         }
 
-        return membre;
-
-      }
-    );
-
-
-    /*
-      SI AUCUN ADMIN N'EXISTE,
-      ON CRÉE AUTOMATIQUEMENT LE COMPTE ADMIN.
-    */
-
-    const adminExiste =
-      membres.some(
-        (membre: any) =>
-          membre.role === 'Admin'
-      );
-
-
-    if (!adminExiste) {
-
-      membres.push({
-
-        nom: 'Jean Kouadio',
-
-        role: 'Admin',
-
-        departement: 'Informatique',
-
-        email: 'jean@privateclub.com',
-
-        identifiant: 'admin',
-
-        motDePasse: '1234'
-
       });
-
-    }
-
-
-    /*
-      SAUVEGARDE DE LA LISTE
-    */
-
-    localStorage.setItem(
-      'membres',
-      JSON.stringify(membres)
-    );
-
-
-    /*
-      RECHERCHE DU COMPTE
-    */
-
-    const membre =
-      membres.find(
-        (membre: any) =>
-
-          membre.identifiant ===
-          this.nom.trim()
-
-          &&
-
-          membre.motDePasse ===
-          this.motDePasse
-      );
-
-
-    if (!membre) {
-
-      this.message =
-        'Identifiant ou mot de passe incorrect.';
-
-      return;
-
-    }
-
-
-    /*
-      CONNEXION RÉUSSIE
-    */
-
-    this.auth.connecter(
-      membre.nom,
-      membre.role
-    );
-
-
-    this.message = '';
-
-
-    this.router.navigate(
-      ['/dashboard']
-    );
 
   }
 

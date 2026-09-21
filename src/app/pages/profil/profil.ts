@@ -1,7 +1,17 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef
+} from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
+
 import { Router } from '@angular/router';
+
+import { HttpClient } from '@angular/common/http';
+
 import { Auth } from '../../services/auth';
+
 
 @Component({
   selector: 'app-profil',
@@ -9,7 +19,7 @@ import { Auth } from '../../services/auth';
   templateUrl: './profil.html',
   styleUrl: './profil.css'
 })
-export class Profil {
+export class Profil implements OnInit {
 
   nom = '';
 
@@ -31,155 +41,355 @@ export class Profil {
 
   modeModification = false;
 
+  modeMotDePasse = false;
+
   message = '';
+
+  motDePasseMessage = '';
+
+  idUtilisateur = 0;
+
+
+  private apiUrl =
+    'http://localhost:3000/api/utilisateurs';
 
 
   constructor(
     private router: Router,
-    private auth: Auth
+    private auth: Auth,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
 
 
   ngOnInit() {
 
-    const nomUtilisateur =
-      this.auth.getNom();
-
-
-    const membresSauvegardes =
-      localStorage.getItem('membres');
-
-
-    if (membresSauvegardes) {
-
-      const membres =
-        JSON.parse(membresSauvegardes);
-
-
-      const membre =
-        membres.find(
-          (m: any) =>
-            m.nom === nomUtilisateur
-        );
-
-
-      if (membre) {
-
-        this.nom =
-          membre.nom || '';
-
-        this.email =
-          membre.email || '';
-
-        this.poste =
-          membre.role || '';
-
-        this.departement =
-          membre.departement || '';
-
-        this.photo =
-          membre.photo || '';
-
-        this.telephone =
-          membre.telephone || '';
-
-        this.matricule =
-          membre.matricule || '';
-
-      }
-
-    }
-
-  }
-
-
-  activerModification() {
-
-    this.modeModification = true;
-
-    this.message = '';
-
-  }
-
-
-  annulerModification() {
-
-    this.modeModification = false;
-
-    this.message = '';
-
-    this.ngOnInit();
-
-  }
-
-
-  enregistrerProfil() {
-
-    const membresSauvegardes =
-      localStorage.getItem('membres');
-
-
-    if (!membresSauvegardes) {
-
-      return;
-
-    }
-
-
-    const membres =
-      JSON.parse(membresSauvegardes);
-
-
-    const index =
-      membres.findIndex(
-        (m: any) =>
-          m.nom === this.auth.getNom()
+    const utilisateur =
+      localStorage.getItem(
+        'utilisateurConnecte'
       );
 
 
-    if (index === -1) {
+    if (!utilisateur) {
+
+      this.router.navigate(['/']);
 
       return;
 
     }
 
 
-    membres[index].nom =
-      this.nom.trim();
-
-    membres[index].email =
-      this.email.trim();
-
-    membres[index].telephone =
-      this.telephone.trim();
-
-    membres[index].photo =
-      this.photo.trim();
+    const donnees =
+      JSON.parse(utilisateur);
 
 
-    localStorage.setItem(
-      'membres',
-      JSON.stringify(membres)
-    );
+    this.idUtilisateur =
+      donnees.id;
 
 
-    this.modeModification = false;
-
-    this.message =
-      'Profil mis à jour avec succès.';
+    this.chargerProfil();
 
   }
 
 
-  changerMotDePasse() {
+  // ===============================
+  // CHARGER LE PROFIL
+  // ===============================
+
+  chargerProfil() {
+
+    if (!this.idUtilisateur) {
+
+      return;
+
+    }
+
+
+    this.http
+      .get<any>(
+        `${this.apiUrl}/${this.idUtilisateur}`
+      )
+      .subscribe({
+
+        next: (utilisateur) => {
+
+          this.nom =
+            utilisateur.nom || '';
+
+          this.email =
+            utilisateur.email || '';
+
+          this.telephone =
+            utilisateur.telephone || '';
+
+          this.poste =
+            utilisateur.poste || '';
+
+          this.departement =
+            utilisateur.departement || '';
+
+          this.photo =
+            utilisateur.photo || '';
+
+
+          // Le matricule n'existe pas
+          // encore dans la base de données
+          this.matricule =
+            utilisateur.matricule || '';
+
+
+          // Mettre à jour les données
+          // enregistrées localement
+          const anciennesDonnees =
+            localStorage.getItem(
+              'utilisateurConnecte'
+            );
+
+
+          if (anciennesDonnees) {
+
+            const donnees =
+              JSON.parse(
+                anciennesDonnees
+              );
+
+
+            donnees.nom =
+              utilisateur.nom;
+
+            donnees.email =
+              utilisateur.email;
+
+            donnees.telephone =
+              utilisateur.telephone;
+
+            donnees.poste =
+              utilisateur.poste;
+
+            donnees.departement =
+              utilisateur.departement;
+
+            donnees.photo =
+              utilisateur.photo;
+
+
+            localStorage.setItem(
+              'utilisateurConnecte',
+              JSON.stringify(donnees)
+            );
+
+          }
+
+
+          this.cdr.detectChanges();
+
+        },
+
+        error: (erreur) => {
+
+          console.error(
+            'ERREUR CHARGEMENT PROFIL :',
+            erreur
+          );
+
+          this.message =
+            'Impossible de charger le profil.';
+
+        }
+
+      });
+
+  }
+
+
+  // ===============================
+  // ACTIVER MODIFICATION
+  // ===============================
+
+  modifierProfil() {
+
+    this.modeModification =
+      true;
+
+    this.message =
+      '';
+
+  }
+
+
+  // ===============================
+  // ENREGISTRER LE PROFIL
+  // ===============================
+
+  enregistrerProfil() {
 
     if (
-      this.nouveauMotDePasse.trim() === ''
-      ||
-      this.confirmationMotDePasse.trim() === ''
+      this.nom.trim() === '' ||
+      this.email.trim() === ''
     ) {
 
       this.message =
+        'Le nom et l’adresse email sont obligatoires.';
+
+      return;
+
+    }
+
+
+    const utilisateur =
+      localStorage.getItem(
+        'utilisateurConnecte'
+      );
+
+
+    if (!utilisateur) {
+
+      this.message =
+        'Utilisateur non connecté.';
+
+      return;
+
+    }
+
+
+    const donneesUtilisateur =
+      JSON.parse(utilisateur);
+
+
+    const donnees = {
+
+      nom:
+        this.nom.trim(),
+
+      email:
+        this.email.trim(),
+
+      motDePasse:
+        '',
+
+      role:
+        donneesUtilisateur.role,
+
+      departement:
+        this.departement.trim()
+
+    };
+
+
+    this.http
+      .put(
+        `${this.apiUrl}/${this.idUtilisateur}`,
+        donnees
+      )
+      .subscribe({
+
+        next: () => {
+
+          const donneesLocales =
+            JSON.parse(
+              localStorage.getItem(
+                'utilisateurConnecte'
+              ) || '{}'
+            );
+
+
+          donneesLocales.nom =
+            this.nom.trim();
+
+          donneesLocales.email =
+            this.email.trim();
+
+          donneesLocales.telephone =
+            this.telephone.trim();
+
+          donneesLocales.photo =
+            this.photo.trim();
+
+          donneesLocales.poste =
+            this.poste;
+
+          donneesLocales.departement =
+            this.departement.trim();
+
+
+          localStorage.setItem(
+            'utilisateurConnecte',
+            JSON.stringify(
+              donneesLocales
+            )
+          );
+
+
+          this.modeModification =
+            false;
+
+          this.message =
+            'Profil mis à jour avec succès.';
+
+
+          this.cdr.detectChanges();
+
+        },
+
+        error: (erreur) => {
+
+          console.error(
+            'ERREUR MODIFICATION PROFIL :',
+            erreur
+          );
+
+
+          if (
+            erreur.status === 409
+          ) {
+
+            this.message =
+              'Cette adresse email est déjà utilisée.';
+
+          } else {
+
+            this.message =
+              'Erreur lors de la modification du profil.';
+
+          }
+
+        }
+
+      });
+
+  }
+
+
+  // ===============================
+  // AFFICHER / MASQUER MOT DE PASSE
+  // ===============================
+
+  modifierMotDePasse() {
+
+    this.modeMotDePasse =
+      !this.modeMotDePasse;
+
+    this.motDePasseMessage =
+      '';
+
+  }
+
+
+  // ===============================
+  // MODIFIER MOT DE PASSE
+  // ===============================
+
+  enregistrerMotDePasse(
+    nouveauMotDePasse: string,
+    confirmationMotDePasse: string
+  ) {
+
+    if (
+      nouveauMotDePasse.trim() === '' ||
+      confirmationMotDePasse.trim() === ''
+    ) {
+
+      this.motDePasseMessage =
         'Veuillez remplir les deux champs.';
 
       return;
@@ -188,11 +398,11 @@ export class Profil {
 
 
     if (
-      this.nouveauMotDePasse !==
-      this.confirmationMotDePasse
+      nouveauMotDePasse !==
+      confirmationMotDePasse
     ) {
 
-      this.message =
+      this.motDePasseMessage =
         'Les mots de passe ne correspondent pas.';
 
       return;
@@ -200,54 +410,92 @@ export class Profil {
     }
 
 
-    const membresSauvegardes =
-      localStorage.getItem('membres');
-
-
-    if (!membresSauvegardes) {
-
-      return;
-
-    }
-
-
-    const membres =
-      JSON.parse(membresSauvegardes);
-
-
-    const index =
-      membres.findIndex(
-        (m: any) =>
-          m.nom === this.auth.getNom()
+    const utilisateur =
+      localStorage.getItem(
+        'utilisateurConnecte'
       );
 
 
-    if (index === -1) {
+    if (!utilisateur) {
+
+      this.motDePasseMessage =
+        'Utilisateur non connecté.';
 
       return;
 
     }
 
 
-    membres[index].motDePasse =
-      this.nouveauMotDePasse.trim();
+    const donneesUtilisateur =
+      JSON.parse(utilisateur);
 
 
-    localStorage.setItem(
-      'membres',
-      JSON.stringify(membres)
-    );
+    const donnees = {
+
+      nom:
+        donneesUtilisateur.nom,
+
+      email:
+        donneesUtilisateur.email,
+
+      motDePasse:
+        nouveauMotDePasse,
+
+      role:
+        donneesUtilisateur.role,
+
+      departement:
+        donneesUtilisateur.departement
+
+    };
 
 
-    this.nouveauMotDePasse = '';
+    this.http
+      .put(
+        `${this.apiUrl}/${this.idUtilisateur}`,
+        donnees
+      )
+      .subscribe({
 
-    this.confirmationMotDePasse = '';
+        next: () => {
 
-    this.message =
-      'Mot de passe modifié avec succès.';
+          this.nouveauMotDePasse =
+            '';
+
+          this.confirmationMotDePasse =
+            '';
+
+          this.modeMotDePasse =
+            false;
+
+          this.motDePasseMessage =
+            'Mot de passe modifié avec succès.';
+
+
+          this.cdr.detectChanges();
+
+        },
+
+        error: (erreur) => {
+
+          console.error(
+            'ERREUR MOT DE PASSE :',
+            erreur
+          );
+
+          this.motDePasseMessage =
+            'Erreur lors de la modification du mot de passe.';
+
+        }
+
+      });
 
   }
 
+
+  // ===============================
+  // RETOUR DASHBOARD
+  // ===============================
 
   retourDashboard() {
 
