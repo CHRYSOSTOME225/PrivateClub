@@ -1,0 +1,248 @@
+<div class="messagerie-page">
+
+  <header class="topbar">
+
+    <img
+      src="/logo.png"
+      alt="PrivateClub"
+      class="logo"
+    >
+
+    <button
+      class="back-button"
+      (click)="retourDashboard()">
+
+      Retour au Dashboard
+
+    </button>
+
+  </header>
+
+
+  <main class="messagerie-container">
+
+
+    <!-- LISTE DES MEMBRES -->
+
+    <aside class="members-panel">
+
+      <div class="panel-header">
+
+        <span class="page-label">
+          PRIVATECLUB
+        </span>
+
+        <h1>Messages</h1>
+
+        <p>
+          Vos conversations privées
+        </p>
+
+      </div>
+
+
+      <div class="search-box">
+
+        <span>🔎</span>
+
+        <input
+          type="text"
+          placeholder="Rechercher..."
+          [(ngModel)]="recherche"
+        >
+
+      </div>
+
+
+      <div class="members-list">
+
+        @for (
+          membre of membresFiltres;
+          track membre.nom
+        ) {
+
+          @if (peutContacter(membre.nom)) {
+
+            <button
+              class="member-item"
+              [class.active]="
+                membreSelectionne === membre.nom
+              "
+              (click)="selectionnerMembre(membre.nom)"
+            >
+
+              <div class="avatar">
+                {{ membre.nom.charAt(0) }}
+              </div>
+
+              <div class="member-details">
+
+                <strong>
+                  {{ membre.nom }}
+                </strong>
+
+                <span>
+                  {{ membre.role }}
+                </span>
+
+              </div>
+
+              <span class="arrow">
+                ›
+              </span>
+
+            </button>
+
+          }
+
+        }
+
+      </div>
+
+    </aside>
+
+
+    <!-- CONVERSATION -->
+
+    <section class="conversation-panel">
+
+      @if (membreSelectionne) {
+
+        <div class="conversation-header">
+
+          <div class="conversation-user">
+
+            <div class="avatar large">
+              {{ membreSelectionne.charAt(0) }}
+            </div>
+
+            <div>
+
+              <h2>
+                {{ membreSelectionne }}
+              </h2>
+
+              <span>
+                Conversation privée
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="message-area">
+
+          @if (
+            !messagesParMembre[membreSelectionne] ||
+            messagesParMembre[membreSelectionne].length === 0
+          ) {
+
+            <div class="empty-conversation">
+
+              <div class="empty-icon">
+                💬
+              </div>
+
+              <h3>
+                Aucun message
+              </h3>
+
+              <p>
+                Commencez la conversation avec
+                {{ membreSelectionne }}.
+              </p>
+
+            </div>
+
+          } @else {
+
+            @for (
+              message of messagesParMembre[membreSelectionne];
+              track $index
+            ) {
+
+              <div
+                class="message"
+                [class.my-message]="
+                  message.expediteur === nomUtilisateur
+                "
+              >
+
+                <div class="message-header">
+
+                  <strong>
+                    {{ message.expediteur }}
+                  </strong>
+
+                  <span>
+                    {{ message.heure }}
+                  </span>
+
+                </div>
+
+                <p>
+                  {{ message.texte }}
+                </p>
+
+              </div>
+
+            }
+
+          }
+
+        </div>
+
+
+        <!-- CHAMP D'ENVOI -->
+
+        @if (peutContacter(membreSelectionne)) {
+
+          <div class="message-input">
+
+            <input
+              type="text"
+              placeholder="Écrire un message..."
+              [(ngModel)]="nouveauMessage"
+              (keyup.enter)="envoyerMessage()"
+            >
+
+            <button
+              (click)="envoyerMessage()">
+
+              Envoyer ➤
+
+            </button>
+
+          </div>
+
+        }
+
+      } @else {
+
+        <div class="no-conversation">
+
+          <div class="big-icon">
+            💬
+          </div>
+
+          <h2>
+            Vos messages
+          </h2>
+
+          <p>
+            Sélectionnez un membre pour commencer
+            une conversation.
+          </p>
+
+        </div>
+
+      }
+
+    </section>
+
+  </main>
+
+</div>

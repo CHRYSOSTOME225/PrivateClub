@@ -1,0 +1,316 @@
+.dashboard {
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #111;
+}
+
+
+/* TOPBAR */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 40px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.logo {
+  width: 130px;
+  height: auto;
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.welcome-small {
+  color: #999;
+  font-size: 11px;
+}
+
+.user-info strong {
+  font-size: 14px;
+}
+
+.logout {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 9px;
+  background: #111;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.logout:hover {
+  opacity: 0.8;
+}
+
+
+/* CONTENU */
+
+.main-content {
+  max-width: 1150px;
+  margin: auto;
+  padding: 50px 30px;
+}
+
+
+/* BIENVENUE */
+
+.welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 35px;
+}
+
+.page-label {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #777;
+}
+
+.welcome h1 {
+  margin: 8px 0;
+  font-size: 34px;
+}
+
+.welcome p {
+  margin: 0;
+  color: #777;
+}
+
+.role-badge {
+  padding: 10px 18px;
+  border-radius: 25px;
+  background: #111;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+
+/* STATISTIQUES */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 45px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: #111;
+  color: white;
+  font-size: 22px;
+}
+
+.stat-card span {
+  display: block;
+  margin-bottom: 4px;
+  color: #777;
+  font-size: 12px;
+}
+
+.stat-card strong {
+  font-size: 25px;
+}
+
+
+/* TITRE SECTION */
+
+.section-title {
+  margin-bottom: 20px;
+}
+
+.section-title > span {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #777;
+}
+
+.section-title h2 {
+  margin: 7px 0 0;
+  font-size: 24px;
+}
+
+
+/* CARTES */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  min-height: 250px;
+  padding: 25px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 17px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card-icon {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  background: #111;
+  color: white;
+  font-size: 23px;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.card p {
+  margin: 0;
+  color: #777;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.card button {
+  margin-top: auto;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 9px;
+  background: #111;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.card button:hover {
+  opacity: 0.8;
+}
+
+
+/* INFORMATION */
+
+.info-box {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 25px;
+  padding: 22px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+.info-icon {
+  width: 45px;
+  height: 45px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #111;
+  color: white;
+  font-size: 20px;
+}
+
+.info-box h2 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.info-box p {
+  margin: 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 750px) {
+
+  .topbar {
+    padding: 15px 20px;
+  }
+
+  .logo {
+    width: 105px;
+  }
+
+  .user-info {
+    display: none;
+  }
+
+  .main-content {
+    padding: 30px 20px;
+  }
+
+  .welcome {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .welcome h1 {
+    font-size: 27px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .info-box {
+    align-items: flex-start;
+  }
+
+}

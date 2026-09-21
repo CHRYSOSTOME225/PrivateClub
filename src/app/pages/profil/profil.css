@@ -1,0 +1,225 @@
+.profil-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #111;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo {
+  width: 130px;
+  height: auto;
+}
+
+.back-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #111;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background: #333;
+}
+
+.content {
+  padding: 50px;
+}
+
+.content h1 {
+  margin-bottom: 30px;
+  font-size: 32px;
+}
+
+.profil-card {
+  max-width: 500px;
+  padding: 30px;
+  background: white;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: #e8efff;
+  font-size: 35px;
+}
+
+.profil-card h2 {
+  margin-bottom: 8px;
+}
+
+.status {
+  color: #666;
+}
+
+.profil-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+  text-align: left;
+}
+
+.profil-info label {
+  margin-top: 8px;
+  color: #333;
+  font-weight: bold;
+}
+
+.profil-info input,
+.profil-info textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.profil-info input:focus,
+.profil-info textarea:focus {
+  border-color: #111;
+}
+
+.profil-info textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.save-button {
+  margin-top: 15px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #111;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background: #333;
+}
+
+@media (max-width: 600px) {
+  .topbar {
+    padding: 20px;
+  }
+
+  .content {
+    padding: 25px 20px;
+  }
+
+  .content h1 {
+    font-size: 26px;
+  }
+
+  .profil-card {
+    padding: 20px;
+  }
+
+  .logo {
+    width: 100px;
+  }
+
+  .back-button {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .edit-button {
+  margin: 15px 0;
+  padding: 10px 20px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: white;
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background: #f0f0f0;
+}
+
+.password-button {
+  margin-top: 10px;
+  padding: 12px 20px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: white;
+  color: #111;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.password-button:hover {
+  background: #f0f0f0;
+}
+.password-form {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f7f8fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.password-form label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.password-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.save-password-button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #111;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.save-password-button:hover {
+  background: #333;
+}
+
+.password-message {
+  margin-top: 15px;
+  font-weight: bold;
+}
+}

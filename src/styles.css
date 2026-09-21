@@ -1,1 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+  margin: 0;
+  background: #f2f4f8;
+  font-family: Arial, sans-serif;
+}
+
+.connexion-container {
+  width: 350px;
+  margin: 100px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 15px black;
+  text-align: center;
+}
+
+h1 {
+  color: blue;
+}
+
+button {
+  background: blue;
+  color: white;
+  padding: 12px;
+}

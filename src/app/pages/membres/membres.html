@@ -1,0 +1,147 @@
+<div class="membres-page">
+
+  <header class="topbar">
+
+    <img
+      src="/logo.png"
+      alt="PrivateClub"
+      class="logo"
+    >
+
+    <button
+      class="back-button"
+      (click)="retourDashboard()">
+
+      Retour au Dashboard
+
+    </button>
+
+  </header>
+
+
+  <main class="content">
+
+    <div class="page-header">
+
+      <div>
+
+        <span class="page-label">
+          PRIVATECLUB
+        </span>
+
+        <h1>Les membres</h1>
+
+        <p>
+          Découvrez les membres de votre club.
+        </p>
+
+      </div>
+
+      <div class="member-count">
+
+        <strong>{{ membresFiltres.length }}</strong>
+
+        <span>membre(s)</span>
+
+      </div>
+
+    </div>
+
+
+    <div class="search-box">
+
+      <span class="search-icon">🔎</span>
+
+      <input
+        type="text"
+        placeholder="Rechercher un membre, un rôle ou un département..."
+        [(ngModel)]="recherche"
+      >
+
+    </div>
+
+
+    <section class="members-list">
+
+      @for (membre of membresFiltres; track membre.nom) {
+
+        <div class="member-card">
+
+          <div class="avatar">
+
+            {{ membre.nom.charAt(0) }}
+
+          </div>
+
+
+          <div class="member-info">
+
+            <h2>{{ membre.nom }}</h2>
+
+            <span class="role">
+              {{ membre.role }}
+            </span>
+
+            <p>
+              🏢 {{ membre.departement }}
+            </p>
+
+            <p>
+              ✉️ {{ membre.email }}
+            </p>
+
+          </div>
+
+
+          <div class="member-action">
+
+            @if (peutEnvoyerMessage(membre)) {
+
+              <button
+                class="message-button"
+                (click)="ouvrirMessagerie(membre.nom)">
+
+                💬 Message
+
+              </button>
+
+            } @else {
+
+              @if (membre.nom === nomUtilisateur) {
+
+                <span class="current-user">
+                  Vous
+                </span>
+
+              }
+
+            }
+
+          </div>
+
+        </div>
+
+      }
+
+
+      @if (membresFiltres.length === 0) {
+
+        <div class="no-result">
+
+          <div>🔎</div>
+
+          <h2>Aucun membre trouvé</h2>
+
+          <p>
+            Essayez avec un autre nom, rôle ou département.
+          </p>
+
+        </div>
+
+      }
+
+    </section>
+
+  </main>
+
+</div>

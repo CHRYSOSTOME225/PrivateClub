@@ -1,0 +1,357 @@
+<div class="dashboard">
+
+  <!-- BARRE DU HAUT -->
+
+  <header class="topbar">
+
+    <div class="logo-container">
+
+      <img
+        src="/logo.png"
+        alt="PrivateClub"
+        class="logo"
+      >
+
+    </div>
+
+
+    <div class="user-area">
+
+      <div class="user-info">
+
+        <span class="welcome-small">
+          Bienvenue
+        </span>
+
+        <strong>
+          {{ nomUtilisateur }}
+        </strong>
+
+      </div>
+
+      <button
+        class="logout"
+        (click)="deconnexion()">
+
+        Déconnexion
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- CONTENU -->
+
+  <main class="main-content">
+
+
+    <!-- BIENVENUE -->
+
+    <section class="welcome">
+
+      <div>
+
+        <span class="page-label">
+          ESPACE PRIVÉ
+        </span>
+
+        <h1>
+          Bienvenue sur PrivateClub
+        </h1>
+
+        <p>
+          Bonjour {{ nomUtilisateur }} 👋
+        </p>
+
+      </div>
+
+
+      <div class="role-badge">
+
+        {{ roleUtilisateur }}
+
+      </div>
+
+    </section>
+
+
+    <!-- STATISTIQUES -->
+
+    <section class="stats">
+
+      <div class="stat-card">
+
+        <div class="stat-icon">
+          👥
+        </div>
+
+        <div>
+
+          <span>
+            Membres
+          </span>
+
+          <strong>
+            {{ nombreMembres }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-icon">
+          📢
+        </div>
+
+        <div>
+
+          <span>
+            Annonces
+          </span>
+
+          <strong>
+            {{ nombreAnnonces }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="stat-icon">
+          💬
+        </div>
+
+        <div>
+
+          <span>
+            Messages
+          </span>
+
+          <strong>
+            {{ nombreMessages }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ACCÈS RAPIDES -->
+
+    <section class="section-title">
+
+      <span>
+        NAVIGATION
+      </span>
+
+      <h2>
+        Accès rapides
+      </h2>
+
+    </section>
+
+
+    <section class="cards">
+
+
+      <!-- MEMBRES -->
+
+      <div class="card">
+
+        <div class="card-icon">
+          👥
+        </div>
+
+        <div class="card-content">
+
+          <h2>
+            Membres
+          </h2>
+
+          <p>
+            Consultez les membres du club,
+            leurs rôles et leurs départements.
+          </p>
+
+        </div>
+
+        <button
+          (click)="voirMembres()">
+
+          Voir les membres →
+
+        </button>
+
+      </div>
+
+
+      <!-- ANNONCES -->
+
+      <div class="card">
+
+        <div class="card-icon">
+          📢
+        </div>
+
+        <div class="card-content">
+
+          <h2>
+            Annonces
+          </h2>
+
+          <p>
+            Consultez les dernières informations
+            et publications du club.
+          </p>
+
+        </div>
+
+        <button
+          (click)="voirAnnonces()">
+
+          Voir les annonces →
+
+        </button>
+
+      </div>
+
+
+      <!-- MESSAGERIE -->
+
+      <div class="card">
+
+        <div class="card-icon">
+          💬
+        </div>
+
+        <div class="card-content">
+
+          <h2>
+            Messagerie
+          </h2>
+
+          <p>
+            Échangez des messages privés
+            avec les membres autorisés.
+          </p>
+
+        </div>
+
+        <button
+          (click)="voirMessagerie()">
+
+          Ouvrir la messagerie →
+
+        </button>
+
+      </div>
+
+
+      <!-- PROFIL -->
+
+      <div class="card">
+
+        <div class="card-icon">
+          👤
+        </div>
+
+        <div class="card-content">
+
+          <h2>
+            Mon profil
+          </h2>
+
+          <p>
+            Gérez vos informations personnelles
+            et vos paramètres.
+          </p>
+
+        </div>
+
+        <button
+          (click)="voirProfil()">
+
+          Voir mon profil →
+
+        </button>
+
+      </div>
+
+
+      <!-- ADMINISTRATION -->
+
+      @if (roleUtilisateur === 'Admin') {
+
+        <div class="card">
+
+          <div class="card-icon">
+            ⚙️
+          </div>
+
+          <div class="card-content">
+
+            <h2>
+              Administration
+            </h2>
+
+            <p>
+              Gérez les membres, les rôles
+              et les comptes de PrivateClub.
+            </p>
+
+          </div>
+
+          <button
+            (click)="ouvrirAdministration()">
+
+            Gérer le club →
+
+          </button>
+
+        </div>
+
+      }
+
+
+    </section>
+
+
+    <!-- INFORMATIONS -->
+
+    <section class="info-box">
+
+      <div class="info-icon">
+        ✦
+      </div>
+
+      <div>
+
+        <h2>
+          Votre espace PrivateClub
+        </h2>
+
+        <p>
+          Vous êtes connecté en tant que
+          <strong>{{ roleUtilisateur }}</strong>.
+          Utilisez les différents espaces
+          selon vos autorisations.
+        </p>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+</div>

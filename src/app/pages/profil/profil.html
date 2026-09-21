@@ -1,0 +1,146 @@
+<div class="profil-page">
+
+  <header class="topbar">
+
+    <img src="/logo.png" alt="PrivateClub" class="logo">
+
+    <button class="back-button" (click)="retourDashboard()">
+      Retour au Dashboard
+    </button>
+
+  </header>
+
+  <main class="content">
+
+    <h1>Mon profil professionnel</h1>
+
+    <div class="profil-card">
+
+      <div class="avatar">
+        👤
+      </div>
+
+      <button class="edit-button" (click)="modifierProfil()">
+        Modifier
+      </button>
+
+      <div class="profil-info">
+
+        <label for="nom">Nom complet</label>
+        <input
+  id="nom"
+  type="text"
+  [(ngModel)]="nom"
+  [disabled]="!modeModification"
+>
+
+        <label for="email">E-mail professionnel</label>
+        <input
+  id="email"
+  type="email"
+  [(ngModel)]="email"
+  [disabled]="!modeModification"
+>
+
+        <label for="telephone">Téléphone</label>
+        <input
+  id="telephone"
+  type="tel"
+  placeholder="Votre numéro"
+  [(ngModel)]="telephone"
+  [disabled]="!modeModification"
+>
+
+        <label for="poste">Poste occupé</label>
+        <input
+  id="poste"
+  type="text"
+  placeholder="Ex : Développeur"
+  [(ngModel)]="poste"
+  [disabled]="!modeModification"
+>
+
+        <label for="departement">Département</label>
+        <input
+  id="departement"
+  type="text"
+  placeholder="Ex : Informatique"
+  [(ngModel)]="departement"
+  [disabled]="!modeModification"
+>
+
+        <label for="matricule">Matricule professionnel</label>
+        <input
+  id="matricule"
+  type="text"
+  placeholder="Votre matricule"
+  [(ngModel)]="matricule"
+  [disabled]="!modeModification"
+>
+
+        <button class="save-button" (click)="enregistrerProfil()">
+          Enregistrer
+        </button>
+
+        <button
+          class="password-button"
+          (click)="modifierMotDePasse()"
+        >
+          Modifier le mot de passe
+        </button>
+
+        @if (modeMotDePasse) {
+
+          <div class="password-form">
+
+            <label for="ancienMotDePasse">
+              Ancien mot de passe
+            </label>
+
+            <input
+              id="ancienMotDePasse"
+              type="password"
+            >
+
+            <label for="nouveauMotDePasse">
+              Nouveau mot de passe
+            </label>
+
+            <input
+  id="nouveauMotDePasse"
+  type="password"
+  #nouveauMotDePasse
+>
+
+            <label for="confirmationMotDePasse">
+              Confirmer le nouveau mot de passe
+            </label>
+
+            <input
+  id="confirmationMotDePasse"
+  type="password"
+  #confirmation
+>
+
+            <button
+  class="save-password-button"
+  (click)="enregistrerMotDePasse(nouveauMotDePasse.value, confirmation.value)"
+>
+  Enregistrer le mot de passe
+</button>
+
+<p class="password-message">
+  {{ motDePasseMessage }}
+</p>
+
+          </div>
+
+        }
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>

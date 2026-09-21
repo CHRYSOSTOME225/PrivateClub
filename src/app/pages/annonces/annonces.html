@@ -1,0 +1,130 @@
+```html
+<div class="annonces-page">
+
+  <header class="topbar">
+
+    <img src="/logo.png" alt="PrivateClub" class="logo">
+
+    <button class="back-button" (click)="retourDashboard()">
+      Retour au Dashboard
+    </button>
+
+  </header>
+
+  <main class="content">
+
+    <h1>Les annonces</h1>
+
+    <p>Découvrez les annonces publiées sur PrivateClub.</p>
+
+
+    @if (roleUtilisateur === 'Admin' || roleUtilisateur === 'Responsable') {
+
+      <div class="publication-box">
+
+        <div class="publication-icon">
+          📢
+        </div>
+
+        <div class="publication-info">
+          <h2>Publier une annonce</h2>
+          <p>Partagez une information avec les membres du club.</p>
+        </div>
+
+        <button
+          class="publish-button"
+          (click)="ouvrirFormulaire()">
+
+          + Nouvelle annonce
+
+        </button>
+
+      </div>
+
+    }
+
+
+    @if (formulaireVisible) {
+
+      <div class="publication-form">
+
+        <div class="form-header">
+          <div>
+            <span class="form-label">NOUVELLE PUBLICATION</span>
+            <h2>Publier une annonce</h2>
+          </div>
+
+          <span class="form-icon">✦</span>
+        </div>
+
+        <input
+          type="text"
+          placeholder="Titre de l'annonce"
+          [(ngModel)]="nouveauTitre"
+        >
+
+        <textarea
+          placeholder="Écrivez le contenu de votre annonce..."
+          [(ngModel)]="nouveauContenu"
+        ></textarea>
+
+        <div class="form-actions">
+
+          <button
+            class="cancel-button"
+            (click)="formulaireVisible = false">
+
+            Annuler
+
+          </button>
+
+          <button
+            class="submit-button"
+            (click)="publierAnnonce()">
+
+            Publier l'annonce →
+
+          </button>
+
+        </div>
+
+      </div>
+
+    }
+
+
+    @for (annonce of annonces; track $index) {
+
+      <div class="annonce-card">
+
+        <h2>{{ annonce.titre }}</h2>
+
+        <p>
+          {{ annonce.contenu }}
+        </p>
+
+        <span>
+          Publié par {{ annonce.auteur }} — {{ annonce.date }}
+        </span>
+        
+        @if (
+  roleUtilisateur === 'Admin' ||
+  (roleUtilisateur === 'Responsable' && annonce.auteur === auth.getNom())
+) {
+
+  <button
+    class="delete-button"
+    (click)="supprimerAnnonce($index)">
+    🗑️ Supprimer
+  </button>
+
+}
+
+      </div>
+
+    }
+
+  </main>
+
+</div>
+```
