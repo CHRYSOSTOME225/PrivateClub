@@ -6,7 +6,6 @@ const connexionRoutes = require("./routes/connexion");
 const annoncesRoutes = require("./routes/annonces");
 const messagesRoutes = require("./routes/messages");
 
-
 const app = express();
 const PORT = 3000;
 

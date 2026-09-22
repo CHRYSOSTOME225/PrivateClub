@@ -1,3 +1,4 @@
+
 import {
   Component,
   OnInit,
@@ -13,9 +14,9 @@ import {
 
 import { FormsModule } from '@angular/forms';
 
-import { HttpClient } from '@angular/common/http';
-
 import { Auth } from '../../services/auth';
+
+import { ApiService } from '../../services/api';
 
 
 @Component({
@@ -45,18 +46,11 @@ export class Messagerie implements OnInit {
   messageErreur = '';
 
 
-  private apiUtilisateurs =
-    'http://localhost:3000/api/utilisateurs';
-
-  private apiMessages =
-    'http://localhost:3000/api/messages';
-
-
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private auth: Auth,
-    private http: HttpClient,
+    private api: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -115,13 +109,11 @@ export class Messagerie implements OnInit {
   // Charger les membres
   chargerMembres() {
 
-    this.http
-      .get<any[]>(
-        this.apiUtilisateurs
-      )
+    this.api
+      .getUtilisateurs()
       .subscribe({
 
-        next: (resultats) => {
+        next: (resultats: any) => {
 
           this.membres =
             resultats;
@@ -129,8 +121,6 @@ export class Messagerie implements OnInit {
           this.cdr.detectChanges();
 
 
-          // Charger la conversation
-          // une fois les membres disponibles
           if (
             this.membreSelectionne
           ) {
@@ -141,7 +131,7 @@ export class Messagerie implements OnInit {
 
         },
 
-        error: (erreur) => {
+        error: (erreur: any) => {
 
           console.error(
             'ERREUR MEMBRES :',
@@ -216,7 +206,6 @@ export class Messagerie implements OnInit {
     }
 
 
-    // Sélection immédiate
     this.membreSelectionne =
       nom;
 
@@ -229,7 +218,6 @@ export class Messagerie implements OnInit {
     this.messages = [];
 
 
-    // Mettre le membre dans l'URL
     this.router.navigate(
       ['/messagerie'],
       {
@@ -240,9 +228,7 @@ export class Messagerie implements OnInit {
     );
 
 
-    // Charger les messages
     this.chargerMessages();
-
 
     this.cdr.detectChanges();
 
@@ -254,7 +240,6 @@ export class Messagerie implements OnInit {
     nom: string
   ): boolean {
 
-    // Ne pas pouvoir se contacter soi-même
     if (
       nom === this.nomUtilisateur
     ) {
@@ -353,13 +338,14 @@ export class Messagerie implements OnInit {
     );
 
 
-    this.http
-      .get<any[]>(
-        `${this.apiMessages}/${this.idUtilisateur}/${membre.id}`
+    this.api
+      .getMessages(
+        this.idUtilisateur,
+        membre.id
       )
       .subscribe({
 
-        next: (resultats) => {
+        next: (resultats: any) => {
 
           this.messages =
             resultats;
@@ -368,7 +354,7 @@ export class Messagerie implements OnInit {
 
         },
 
-        error: (erreur) => {
+        error: (erreur: any) => {
 
           console.error(
             'ERREUR MESSAGES :',
@@ -424,24 +410,11 @@ export class Messagerie implements OnInit {
     }
 
 
-    const donnees = {
-
-      expediteur_id:
+    this.api
+      .envoyerMessage(
         this.idUtilisateur,
-
-      destinataire_id:
         membre.id,
-
-      contenu:
         this.nouveauMessage.trim()
-
-    };
-
-
-    this.http
-      .post(
-        this.apiMessages,
-        donnees
       )
       .subscribe({
 
@@ -457,7 +430,7 @@ export class Messagerie implements OnInit {
 
         },
 
-        error: (erreur) => {
+        error: (erreur: any) => {
 
           console.error(
             'ERREUR ENVOI MESSAGE :',

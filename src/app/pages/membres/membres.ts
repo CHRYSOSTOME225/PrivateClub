@@ -1,8 +1,9 @@
+
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Auth } from '../../services/auth';
+import { ApiService } from '../../services/api';
 
 @Component({
   selector: 'app-membres',
@@ -23,7 +24,7 @@ export class Membres {
   constructor(
     private router: Router,
     private auth: Auth,
-    private http: HttpClient,
+    private api: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -46,13 +47,11 @@ export class Membres {
 
     console.log('CHARGEMENT DES MEMBRES...');
 
-    this.http
-      .get<any[]>(
-        'http://localhost:3000/api/utilisateurs'
-      )
+    this.api
+      .getUtilisateurs()
       .subscribe({
 
-        next: (resultats) => {
+        next: (resultats: any) => {
 
           console.log(
             'MEMBRES REÇUS DE MYSQL :',
@@ -61,12 +60,6 @@ export class Membres {
 
           this.membres = resultats;
 
-          console.log(
-            'MEMBRES DANS LE TABLEAU :',
-            this.membres
-          );
-
-          // Force Angular à actualiser l'affichage
           this.cdr.detectChanges();
 
         },

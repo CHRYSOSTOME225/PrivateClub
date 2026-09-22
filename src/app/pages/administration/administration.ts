@@ -1,8 +1,16 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  ChangeDetectorRef
+} from '@angular/core';
+
 import { Router } from '@angular/router';
+
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+
 import { Auth } from '../../services/auth';
+
+import { ApiService } from '../../services/api';
+
 
 @Component({
   selector: 'app-administration',
@@ -38,18 +46,24 @@ export class Administration {
 
   message = '';
 
+
   constructor(
     private router: Router,
     private auth: Auth,
-    private http: HttpClient,
+    private api: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
 
+
   ngOnInit() {
 
-    if (this.auth.getRole() !== 'Admin') {
+    if (
+      this.auth.getRole() !== 'Admin'
+    ) {
 
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(
+        ['/dashboard']
+      );
 
       return;
 
@@ -59,17 +73,21 @@ export class Administration {
 
   }
 
+
+  // ==============================
+  // CHARGER LES MEMBRES
+  // ==============================
+
   chargerMembres() {
 
-    this.http
-      .get<any[]>(
-        'http://localhost:3000/api/utilisateurs'
-      )
+    this.api
+      .getUtilisateurs()
       .subscribe({
 
-        next: (resultats) => {
+        next: (resultats: any) => {
 
-          this.membres = resultats;
+          this.membres =
+            resultats;
 
           console.log(
             'MEMBRES ADMINISTRATION :',
@@ -80,7 +98,7 @@ export class Administration {
 
         },
 
-        error: (erreur) => {
+        error: (erreur: any) => {
 
           console.error(
             'ERREUR CHARGEMENT MEMBRES :',
@@ -96,6 +114,11 @@ export class Administration {
 
   }
 
+
+  // ==============================
+  // RECHERCHE
+  // ==============================
+
   get membresFiltres() {
 
     const texte =
@@ -103,71 +126,98 @@ export class Administration {
         .toLowerCase()
         .trim();
 
+
     if (texte === '') {
 
       return this.membres;
 
     }
 
-    return this.membres.filter(membre =>
 
-      membre.nom
-        .toLowerCase()
-        .includes(texte)
+    return this.membres.filter(
+      membre =>
 
-      ||
+        membre.nom
+          .toLowerCase()
+          .includes(texte)
 
-      membre.role
-        .toLowerCase()
-        .includes(texte)
+        ||
 
-      ||
+        membre.role
+          .toLowerCase()
+          .includes(texte)
 
-      (membre.departement || '')
-        .toLowerCase()
-        .includes(texte)
+        ||
 
-      ||
+        (membre.departement || '')
+          .toLowerCase()
+          .includes(texte)
 
-      membre.email
-        .toLowerCase()
-        .includes(texte)
+        ||
+
+        membre.email
+          .toLowerCase()
+          .includes(texte)
 
     );
 
   }
 
+
+  // ==============================
+  // AJOUTER UN MEMBRE
+  // ==============================
+
   ouvrirAjout() {
 
-    this.modeModification = false;
+    this.modeModification =
+      false;
 
-    this.membreModifieId = null;
+    this.membreModifieId =
+      null;
 
     this.nouveauNom = '';
 
-    this.nouveauRole = 'Membre';
+    this.nouveauRole =
+      'Membre';
 
-    this.nouveauDepartement = '';
+    this.nouveauDepartement =
+      '';
 
-    this.nouvelEmail = '';
+    this.nouvelEmail =
+      '';
 
-    this.nouvelIdentifiant = '';
+    this.nouvelIdentifiant =
+      '';
 
-    this.nouveauMotDePasse = '';
+    this.nouveauMotDePasse =
+      '';
 
-    this.afficherMotDePasse = false;
+    this.afficherMotDePasse =
+      false;
 
-    this.message = '';
+    this.message =
+      '';
 
-    this.formulaireVisible = true;
+    this.formulaireVisible =
+      true;
 
   }
 
-  ouvrirModification(membre: any) {
 
-    this.modeModification = true;
+  // ==============================
+  // MODIFIER UN MEMBRE
+  // ==============================
 
-    this.membreModifieId = membre.id;
+  ouvrirModification(
+    membre: any
+  ) {
+
+    this.modeModification =
+      true;
+
+    this.membreModifieId =
+      membre.id;
 
     this.nouveauNom =
       membre.nom;
@@ -184,15 +234,24 @@ export class Administration {
     this.nouvelIdentifiant =
       membre.email;
 
-    this.nouveauMotDePasse = '';
+    this.nouveauMotDePasse =
+      '';
 
-    this.afficherMotDePasse = false;
+    this.afficherMotDePasse =
+      false;
 
-    this.message = '';
+    this.message =
+      '';
 
-    this.formulaireVisible = true;
+    this.formulaireVisible =
+      true;
 
   }
+
+
+  // ==============================
+  // AFFICHER / CACHER MOT DE PASSE
+  // ==============================
 
   basculerMotDePasse() {
 
@@ -200,6 +259,11 @@ export class Administration {
       !this.afficherMotDePasse;
 
   }
+
+
+  // ==============================
+  // ENREGISTRER
+  // ==============================
 
   enregistrerMembre() {
 
@@ -216,6 +280,7 @@ export class Administration {
       return;
 
     }
+
 
     const donnees = {
 
@@ -236,61 +301,104 @@ export class Administration {
 
     };
 
+
+    // ==============================
+    // MODIFICATION
+    // ==============================
+
     if (this.modeModification) {
 
-      this.http
-        .put(
-          `http://localhost:3000/api/utilisateurs/${this.membreModifieId}`,
+      this.api
+        .modifierUtilisateur(
+          this.membreModifieId!,
           donnees
         )
         .subscribe({
 
           next: () => {
 
-            this.formulaireVisible = false;
+            this.formulaireVisible =
+              false;
 
-            this.message = '';
+            this.message =
+              '';
 
             this.chargerMembres();
 
           },
 
-          error: (erreur) => {
+          error: (erreur: any) => {
 
-            console.error(erreur);
+            console.error(
+              'ERREUR MODIFICATION :',
+              erreur
+            );
 
-            this.message =
-              'Erreur lors de la modification.';
+            if (
+              erreur.status === 409
+            ) {
+
+              this.message =
+                'Cette adresse email est déjà utilisée.';
+
+            } else {
+
+              this.message =
+                'Erreur lors de la modification.';
+
+            }
 
           }
 
         });
 
-    } else {
+    }
 
-      this.http
-        .post(
-          'http://localhost:3000/api/utilisateurs',
+
+    // ==============================
+    // CREATION
+    // ==============================
+
+    else {
+
+      this.api
+        .creerUtilisateur(
           donnees
         )
         .subscribe({
 
           next: () => {
 
-            this.formulaireVisible = false;
+            this.formulaireVisible =
+              false;
 
-            this.message = '';
+            this.message =
+              '';
 
             this.chargerMembres();
 
           },
 
-          error: (erreur) => {
+          error: (erreur: any) => {
 
-            console.error(erreur);
+            console.error(
+              'ERREUR CREATION :',
+              erreur
+            );
 
-            this.message =
-              'Erreur lors de la création du membre.';
+            if (
+              erreur.status === 409
+            ) {
+
+              this.message =
+                'Cette adresse email est déjà utilisée.';
+
+            } else {
+
+              this.message =
+                'Erreur lors de la création du membre.';
+
+            }
 
           }
 
@@ -300,9 +408,18 @@ export class Administration {
 
   }
 
-  supprimerMembre(membre: any) {
 
-    if (membre.role === 'Admin') {
+  // ==============================
+  // SUPPRIMER
+  // ==============================
+
+  supprimerMembre(
+    membre: any
+  ) {
+
+    if (
+      membre.role === 'Admin'
+    ) {
 
       this.message =
         'Le compte Admin ne peut pas être supprimé.';
@@ -311,10 +428,12 @@ export class Administration {
 
     }
 
+
     const confirmation =
       confirm(
         `Voulez-vous supprimer ${membre.nom} ?`
       );
+
 
     if (!confirmation) {
 
@@ -322,23 +441,28 @@ export class Administration {
 
     }
 
-    this.http
-      .delete(
-        `http://localhost:3000/api/utilisateurs/${membre.id}`
+
+    this.api
+      .supprimerUtilisateur(
+        membre.id
       )
       .subscribe({
 
         next: () => {
 
-          this.message = '';
+          this.message =
+            '';
 
           this.chargerMembres();
 
         },
 
-        error: (erreur) => {
+        error: (erreur: any) => {
 
-          console.error(erreur);
+          console.error(
+            'ERREUR SUPPRESSION :',
+            erreur
+          );
 
           this.message =
             'Erreur lors de la suppression.';
@@ -349,13 +473,25 @@ export class Administration {
 
   }
 
+
+  // ==============================
+  // FERMER
+  // ==============================
+
   fermerFormulaire() {
 
-    this.formulaireVisible = false;
+    this.formulaireVisible =
+      false;
 
-    this.message = '';
+    this.message =
+      '';
 
   }
+
+
+  // ==============================
+  // RETOUR DASHBOARD
+  // ==============================
 
   retourDashboard() {
 

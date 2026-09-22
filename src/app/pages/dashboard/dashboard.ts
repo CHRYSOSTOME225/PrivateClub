@@ -1,6 +1,12 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef
+} from '@angular/core';
+
 import { Router } from '@angular/router';
 import { Auth } from '../../services/auth';
+import { ApiService } from '../../services/api';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,21 +14,21 @@ import { Auth } from '../../services/auth';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
 
   nomUtilisateur = 'Utilisateur';
   roleUtilisateur = '';
 
-  nombreMembres = 4;
-  nombreAnnonces = 2;
+  nombreMembres = 0;
+  nombreAnnonces = 0;
   nombreMessages = 0;
-
 
   constructor(
     private router: Router,
-    private auth: Auth
+    private auth: Auth,
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
   ) {}
-
 
   ngOnInit() {
 
@@ -32,71 +38,98 @@ export class Dashboard {
     this.roleUtilisateur =
       this.auth.getRole() || 'Membre';
 
+    console.log(
+      'DASHBOARD - utilisateur :',
+      this.nomUtilisateur
+    );
+
+    console.log(
+      'DASHBOARD - rôle :',
+      this.roleUtilisateur
+    );
+
     this.calculerStatistiques();
-
   }
-
 
   calculerStatistiques() {
 
-    // NOMBRE DE MEMBRES
+    // ==============================
+    // MEMBRES
+    // ==============================
 
-    const membres =
-      localStorage.getItem('membres');
+    this.api
+      .getUtilisateurs()
+      .subscribe({
+        next: (membres: any) => {
 
-    if (membres) {
+          console.log(
+            'DASHBOARD - utilisateurs reçus :',
+            membres
+          );
 
-      const listeMembres =
-        JSON.parse(membres);
+          this.nombreMembres =
+            membres.length;
 
-      this.nombreMembres =
-        listeMembres.length;
+          console.log(
+            'NOMBRE DE MEMBRES :',
+            this.nombreMembres
+          );
 
-    }
+          this.cdr.detectChanges();
+        },
 
+        error: (erreur: any) => {
 
-    // NOMBRE D'ANNONCES
-
-    const annonces =
-      localStorage.getItem('annonces');
-
-    if (annonces) {
-
-      const listeAnnonces =
-        JSON.parse(annonces);
-
-      this.nombreAnnonces =
-        listeAnnonces.length;
-
-    }
-
-
-    // NOMBRE DE MESSAGES
-
-    const messages =
-      localStorage.getItem('messages');
-
-    if (messages) {
-
-      const messagesParMembre =
-        JSON.parse(messages);
-
-      let total = 0;
-
-      Object.keys(messagesParMembre).forEach(
-        nom => {
-
-          total +=
-            messagesParMembre[nom].length;
+          console.error(
+            'ERREUR DASHBOARD MEMBRES :',
+            erreur
+          );
 
         }
-      );
+      });
 
-      this.nombreMessages =
-        total;
 
-    }
+    // ==============================
+    // ANNONCES
+    // ==============================
 
+    this.api
+      .getAnnonces()
+      .subscribe({
+        next: (annonces: any) => {
+
+          console.log(
+            'DASHBOARD - annonces reçues :',
+            annonces
+          );
+
+          this.nombreAnnonces =
+            annonces.length;
+
+          console.log(
+            'NOMBRE D ANNONCES :',
+            this.nombreAnnonces
+          );
+
+          this.cdr.detectChanges();
+        },
+
+        error: (erreur: any) => {
+
+          console.error(
+            'ERREUR DASHBOARD ANNONCES :',
+            erreur
+          );
+
+        }
+      });
+
+
+    // ==============================
+    // MESSAGES
+    // ==============================
+
+    this.nombreMessages = 0;
   }
 
 

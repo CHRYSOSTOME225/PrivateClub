@@ -8,9 +8,9 @@ import { FormsModule } from '@angular/forms';
 
 import { Router } from '@angular/router';
 
-import { HttpClient } from '@angular/common/http';
-
 import { Auth } from '../../services/auth';
+
+import { ApiService } from '../../services/api';
 
 
 @Component({
@@ -50,14 +50,10 @@ export class Profil implements OnInit {
   idUtilisateur = 0;
 
 
-  private apiUrl =
-    'http://localhost:3000/api/utilisateurs';
-
-
   constructor(
     private router: Router,
     private auth: Auth,
-    private http: HttpClient,
+    private api: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -105,13 +101,13 @@ export class Profil implements OnInit {
     }
 
 
-    this.http
-      .get<any>(
-        `${this.apiUrl}/${this.idUtilisateur}`
+    this.api
+      .getUtilisateur(
+        this.idUtilisateur
       )
       .subscribe({
 
-        next: (utilisateur) => {
+        next: (utilisateur: any) => {
 
           this.nom =
             utilisateur.nom || '';
@@ -131,9 +127,6 @@ export class Profil implements OnInit {
           this.photo =
             utilisateur.photo || '';
 
-
-          // Le matricule n'existe pas
-          // encore dans la base de données
           this.matricule =
             utilisateur.matricule || '';
 
@@ -185,7 +178,7 @@ export class Profil implements OnInit {
 
         },
 
-        error: (erreur) => {
+        error: (erreur: any) => {
 
           console.error(
             'ERREUR CHARGEMENT PROFIL :',
@@ -271,14 +264,23 @@ export class Profil implements OnInit {
         donneesUtilisateur.role,
 
       departement:
-        this.departement.trim()
+        this.departement.trim(),
+
+      telephone:
+        this.telephone.trim(),
+
+      poste:
+        this.poste.trim(),
+
+      photo:
+        this.photo.trim()
 
     };
 
 
-    this.http
-      .put(
-        `${this.apiUrl}/${this.idUtilisateur}`,
+    this.api
+      .modifierUtilisateur(
+        this.idUtilisateur,
         donnees
       )
       .subscribe({
@@ -306,7 +308,7 @@ export class Profil implements OnInit {
             this.photo.trim();
 
           donneesLocales.poste =
-            this.poste;
+            this.poste.trim();
 
           donneesLocales.departement =
             this.departement.trim();
@@ -331,7 +333,7 @@ export class Profil implements OnInit {
 
         },
 
-        error: (erreur) => {
+        error: (erreur: any) => {
 
           console.error(
             'ERREUR MODIFICATION PROFIL :',
@@ -445,14 +447,23 @@ export class Profil implements OnInit {
         donneesUtilisateur.role,
 
       departement:
-        donneesUtilisateur.departement
+        donneesUtilisateur.departement,
+
+      telephone:
+        donneesUtilisateur.telephone || '',
+
+      poste:
+        donneesUtilisateur.poste || '',
+
+      photo:
+        donneesUtilisateur.photo || ''
 
     };
 
 
-    this.http
-      .put(
-        `${this.apiUrl}/${this.idUtilisateur}`,
+    this.api
+      .modifierUtilisateur(
+        this.idUtilisateur,
         donnees
       )
       .subscribe({
@@ -476,7 +487,7 @@ export class Profil implements OnInit {
 
         },
 
-        error: (erreur) => {
+        error: (erreur: any) => {
 
           console.error(
             'ERREUR MOT DE PASSE :',
