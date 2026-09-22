@@ -1,7 +1,12 @@
+
 import { Component } from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
+
 import { Router } from '@angular/router';
+
 import { Auth } from '../../services/auth';
+
 
 @Component({
   selector: 'app-connexion',
@@ -11,21 +16,27 @@ import { Auth } from '../../services/auth';
 })
 export class Connexion {
 
-  nom = '';
+  email = '';
 
   motDePasse = '';
 
   message = '';
+
 
   constructor(
     private router: Router,
     private auth: Auth
   ) {}
 
+
+  // ===============================
+  // SE CONNECTER
+  // ===============================
+
   seConnecter() {
 
     if (
-      this.nom.trim() === '' ||
+      this.email.trim() === '' ||
       this.motDePasse.trim() === ''
     ) {
 
@@ -36,9 +47,10 @@ export class Connexion {
 
     }
 
+
     this.auth
       .connecter(
-        this.nom.trim(),
+        this.email.trim(),
         this.motDePasse
       )
       .subscribe({
@@ -53,14 +65,34 @@ export class Connexion {
 
         },
 
+
         error: (erreur) => {
 
-          if (erreur.status === 401) {
+          console.error(
+            'ERREUR CONNEXION :',
+            erreur
+          );
+
+
+          if (
+            erreur.status === 401
+          ) {
 
             this.message =
               'Email ou mot de passe incorrect.';
 
-          } else {
+          }
+
+          else if (
+            erreur.status === 400
+          ) {
+
+            this.message =
+              'Veuillez remplir tous les champs.';
+
+          }
+
+          else {
 
             this.message =
               'Erreur de connexion au serveur.';
@@ -74,3 +106,4 @@ export class Connexion {
   }
 
 }
+

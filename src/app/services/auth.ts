@@ -8,11 +8,16 @@ import { Observable, tap } from 'rxjs';
 export class Auth {
 
   private connecte = false;
+
+  private id = 0;
+
   private role = '';
+
   private nom = '';
 
   private apiUrl =
     'http://localhost:3000/api/connexion';
+
 
   constructor(private http: HttpClient) {
 
@@ -29,17 +34,26 @@ export class Auth {
       this.connecte =
         donnees.connecte;
 
+      this.id =
+        donnees.id;
+
       this.role =
         donnees.role;
 
       this.nom =
         donnees.nom;
+
     }
+
   }
 
+
   estConnecte() {
+
     return this.connecte;
+
   }
+
 
   connecter(
     email: string,
@@ -58,17 +72,22 @@ export class Auth {
 
         this.connecte = true;
 
+        this.id =
+          reponse.utilisateur.id;
+
         this.nom =
           reponse.utilisateur.nom;
 
         this.role =
           reponse.utilisateur.role;
 
+
         // Enregistrer le JWT
         localStorage.setItem(
           'token',
           reponse.token
         );
+
 
         // Enregistrer les informations
         // de l'utilisateur
@@ -108,32 +127,52 @@ export class Auth {
       })
 
     );
+
   }
+
 
   deconnecter() {
 
     this.connecte = false;
 
+    this.id = 0;
+
     this.nom = '';
 
     this.role = '';
+
 
     localStorage.removeItem(
       'utilisateurConnecte'
     );
 
+
     // Supprimer également le JWT
     localStorage.removeItem(
       'token'
     );
+
   }
+
+
+  getId() {
+
+    return this.id;
+
+  }
+
 
   getRole() {
+
     return this.role;
+
   }
 
+
   getNom() {
+
     return this.nom;
+
   }
 
 }

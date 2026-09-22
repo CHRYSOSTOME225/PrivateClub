@@ -1,4 +1,3 @@
-
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -21,6 +20,9 @@ export class Membres {
 
   nomUtilisateur = '';
 
+  idUtilisateur: any = null;
+
+
   constructor(
     private router: Router,
     private auth: Auth,
@@ -28,24 +30,50 @@ export class Membres {
     private cdr: ChangeDetectorRef
   ) {}
 
+
   ngOnInit() {
 
-    console.log('PAGE MEMBRES CHARGÉE');
+    console.log(
+      'PAGE MEMBRES CHARGÉE'
+    );
 
-    this.roleUtilisateur = this.auth.getRole();
+    this.roleUtilisateur =
+      this.auth.getRole();
 
-    this.nomUtilisateur = this.auth.getNom();
+    this.nomUtilisateur =
+      this.auth.getNom();
 
-    console.log('ROLE :', this.roleUtilisateur);
-    console.log('NOM :', this.nomUtilisateur);
+    this.idUtilisateur =
+      this.auth.getId();
+
+
+    console.log(
+      'ROLE :',
+      this.roleUtilisateur
+    );
+
+    console.log(
+      'NOM :',
+      this.nomUtilisateur
+    );
+
+    console.log(
+      'ID :',
+      this.idUtilisateur
+    );
+
 
     this.chargerMembres();
 
   }
 
+
   chargerMembres() {
 
-    console.log('CHARGEMENT DES MEMBRES...');
+    console.log(
+      'CHARGEMENT DES MEMBRES...'
+    );
+
 
     this.api
       .getUtilisateurs()
@@ -58,11 +86,13 @@ export class Membres {
             resultats
           );
 
-          this.membres = resultats;
+          this.membres =
+            resultats;
 
           this.cdr.detectChanges();
 
         },
+
 
         error: (erreur) => {
 
@@ -77,6 +107,7 @@ export class Membres {
 
   }
 
+
   get membresFiltres() {
 
     const texte =
@@ -84,44 +115,53 @@ export class Membres {
         .toLowerCase()
         .trim();
 
+
     if (texte === '') {
 
       return this.membres;
 
     }
 
-    return this.membres.filter(membre =>
 
-      membre.nom
-        .toLowerCase()
-        .includes(texte)
+    return this.membres.filter(
+      membre =>
 
-      ||
+        membre.nom
+          .toLowerCase()
+          .includes(texte)
 
-      membre.role
-        .toLowerCase()
-        .includes(texte)
+        ||
 
-      ||
+        membre.role
+          .toLowerCase()
+          .includes(texte)
 
-      (membre.departement || '')
-        .toLowerCase()
-        .includes(texte)
+        ||
+
+        (membre.departement || '')
+          .toLowerCase()
+          .includes(texte)
 
     );
 
   }
 
-  peutEnvoyerMessage(membre: any): boolean {
 
+  peutEnvoyerMessage(
+    membre: any
+  ): boolean {
+
+    // Ne pas envoyer de message à soi-même
     if (
-      membre.nom === this.nomUtilisateur
+      membre.id == this.idUtilisateur
     ) {
 
       return false;
 
     }
 
+
+    // Admin → tout le monde
     if (
       this.roleUtilisateur === 'Admin'
     ) {
@@ -130,6 +170,8 @@ export class Membres {
 
     }
 
+
+    // Responsable → Admin + Membres
     if (
       this.roleUtilisateur === 'Responsable'
     ) {
@@ -141,22 +183,41 @@ export class Membres {
 
     }
 
+
+    // Membre → Responsable + autres Membres
     if (
       this.roleUtilisateur === 'Membre'
     ) {
 
       return (
-        membre.role === 'Membre' ||
-        membre.role === 'Responsable'
+        membre.role === 'Responsable' ||
+        membre.role === 'Membre'
       );
 
     }
+
 
     return false;
 
   }
 
-  ouvrirMessagerie(nom: string) {
+
+  // ===============================
+  // VÉRIFIER SI C'EST MON PROFIL
+  // ===============================
+
+  estMonProfil(
+    membre: any
+  ): boolean {
+
+    return membre.id == this.idUtilisateur;
+
+  }
+
+
+  ouvrirMessagerie(
+    nom: string
+  ) {
 
     this.router.navigate(
       ['/messagerie'],
@@ -168,6 +229,7 @@ export class Membres {
     );
 
   }
+
 
   retourDashboard() {
 

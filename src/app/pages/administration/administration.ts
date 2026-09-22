@@ -1,3 +1,4 @@
+
 import {
   Component,
   ChangeDetectorRef
@@ -57,6 +58,7 @@ export class Administration {
 
   ngOnInit() {
 
+    // Vérification côté frontend
     if (
       this.auth.getRole() !== 'Admin'
     ) {
@@ -105,8 +107,30 @@ export class Administration {
             erreur
           );
 
-          this.message =
-            'Impossible de charger les membres.';
+          if (
+            erreur.status === 401
+          ) {
+
+            this.message =
+              'Votre session a expiré.';
+
+          }
+
+          else if (
+            erreur.status === 403
+          ) {
+
+            this.message =
+              'Accès réservé à l’Admin.';
+
+          }
+
+          else {
+
+            this.message =
+              'Impossible de charger les membres.';
+
+          }
 
         }
 
@@ -176,7 +200,8 @@ export class Administration {
     this.membreModifieId =
       null;
 
-    this.nouveauNom = '';
+    this.nouveauNom =
+      '';
 
     this.nouveauRole =
       'Membre';
@@ -234,6 +259,8 @@ export class Administration {
     this.nouvelIdentifiant =
       membre.email;
 
+    // Le mot de passe est vide
+    // par défaut lors d'une modification.
     this.nouveauMotDePasse =
       '';
 
@@ -267,31 +294,43 @@ export class Administration {
 
   enregistrerMembre() {
 
+    // Champs obligatoires communs
     if (
       this.nouveauNom.trim() === '' ||
       this.nouveauDepartement.trim() === '' ||
-      this.nouvelEmail.trim() === '' ||
-      this.nouveauMotDePasse.trim() === ''
+      this.nouvelEmail.trim() === ''
     ) {
 
       this.message =
-        'Veuillez remplir tous les champs.';
+        'Veuillez remplir tous les champs obligatoires.';
 
       return;
 
     }
 
 
-    const donnees = {
+    // Mot de passe obligatoire
+    // uniquement lors de la création
+    if (
+      !this.modeModification &&
+      this.nouveauMotDePasse.trim() === ''
+    ) {
+
+      this.message =
+        'Le mot de passe est obligatoire pour créer un membre.';
+
+      return;
+
+    }
+
+
+    const donnees: any = {
 
       nom:
         this.nouveauNom.trim(),
 
       email:
         this.nouvelEmail.trim(),
-
-      motDePasse:
-        this.nouveauMotDePasse.trim(),
 
       role:
         this.nouveauRole,
@@ -302,11 +341,25 @@ export class Administration {
     };
 
 
+    // Ajouter le mot de passe
+    // seulement s'il a été renseigné
+    if (
+      this.nouveauMotDePasse.trim() !== ''
+    ) {
+
+      donnees.motDePasse =
+        this.nouveauMotDePasse.trim();
+
+    }
+
+
     // ==============================
     // MODIFICATION
     // ==============================
 
-    if (this.modeModification) {
+    if (
+      this.modeModification
+    ) {
 
       this.api
         .modifierUtilisateur(
@@ -334,14 +387,35 @@ export class Administration {
               erreur
             );
 
+
             if (
+              erreur.status === 401
+            ) {
+
+              this.message =
+                'Votre session a expiré.';
+
+            }
+
+            else if (
+              erreur.status === 403
+            ) {
+
+              this.message =
+                'Vous n’avez pas les droits nécessaires.';
+
+            }
+
+            else if (
               erreur.status === 409
             ) {
 
               this.message =
                 'Cette adresse email est déjà utilisée.';
 
-            } else {
+            }
+
+            else {
 
               this.message =
                 'Erreur lors de la modification.';
@@ -386,14 +460,35 @@ export class Administration {
               erreur
             );
 
+
             if (
+              erreur.status === 401
+            ) {
+
+              this.message =
+                'Votre session a expiré.';
+
+            }
+
+            else if (
+              erreur.status === 403
+            ) {
+
+              this.message =
+                'Seul un Admin peut créer un membre.';
+
+            }
+
+            else if (
               erreur.status === 409
             ) {
 
               this.message =
                 'Cette adresse email est déjà utilisée.';
 
-            } else {
+            }
+
+            else {
 
               this.message =
                 'Erreur lors de la création du membre.';
@@ -417,6 +512,7 @@ export class Administration {
     membre: any
   ) {
 
+    // Protection frontend
     if (
       membre.role === 'Admin'
     ) {
@@ -464,8 +560,31 @@ export class Administration {
             erreur
           );
 
-          this.message =
-            'Erreur lors de la suppression.';
+
+          if (
+            erreur.status === 401
+          ) {
+
+            this.message =
+              'Votre session a expiré.';
+
+          }
+
+          else if (
+            erreur.status === 403
+          ) {
+
+            this.message =
+              'Seul un Admin peut supprimer un membre.';
+
+          }
+
+          else {
+
+            this.message =
+              'Erreur lors de la suppression.';
+
+          }
 
         }
 

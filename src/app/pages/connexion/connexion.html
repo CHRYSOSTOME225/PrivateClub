@@ -1,22 +1,40 @@
 <div class="connexion-page">
+
   <div class="connexion-container">
-    <img src="/logo.png" alt="Logo PrivateClub" class="logo">
+
+    <img
+      src="/logo.png"
+      alt="Logo PrivateClub"
+      class="logo"
+    >
 
     <h1>PrivateClub</h1>
+
     <h2>Connexion</h2>
 
+
     <form (ngSubmit)="seConnecter()">
-      <label for="nom">Nom d'utilisateur</label>
+
+      <!-- EMAIL -->
+
+      <label for="email">
+        Email professionnel
+      </label>
 
       <input
-        type="text"
-        id="nom"
-        name="nom"
-        [(ngModel)]="nom"
-        placeholder="Entrez votre nom"
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="email"
+        placeholder="Entrez votre email"
       >
 
-      <label for="motdepasse">Mot de passe</label>
+
+      <!-- MOT DE PASSE -->
+
+      <label for="motdepasse">
+        Mot de passe
+      </label>
 
       <input
         type="password"
@@ -26,9 +44,22 @@
         placeholder="Entrez votre mot de passe"
       >
 
-      <button type="submit">Se connecter</button>
+
+      <!-- BOUTON -->
+
+      <button type="submit">
+        Se connecter
+      </button>
+
     </form>
 
-    <p class="message">{{ message }}</p>
+
+    <!-- MESSAGE -->
+
+    <p class="message">
+      {{ message }}
+    </p>
+
   </div>
+
 </div>

@@ -1,3 +1,4 @@
+
 <div class="administration-page">
 
   <!-- BARRE DU HAUT -->
@@ -239,26 +240,33 @@
 
             <label>
               Mot de passe
+
+              @if (modeModification) {
+                <span>
+                  (laisser vide pour conserver l'actuel)
+                </span>
+              }
+
             </label>
 
             <div class="password-field">
 
-  <input
-    [type]="afficherMotDePasse ? 'text' : 'password'"
-    placeholder="Ex : 1234"
-    [(ngModel)]="nouveauMotDePasse"
-  >
+              <input
+                [type]="afficherMotDePasse ? 'text' : 'password'"
+                placeholder="Ex : 1234"
+                [(ngModel)]="nouveauMotDePasse"
+              >
 
-  <button
-    type="button"
-    class="password-toggle"
-    (click)="basculerMotDePasse()">
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="basculerMotDePasse()">
 
-    {{ afficherMotDePasse ? '🙈' : '👁️' }}
+                {{ afficherMotDePasse ? '🙈' : '👁️' }}
 
-  </button>
+              </button>
 
-</div>
+            </div>
 
           </div>
 
@@ -323,7 +331,7 @@
 
         @for (
           membre of membresFiltres;
-          track membre.nom
+          track membre.id
         ) {
 
 
@@ -437,3 +445,4 @@
   </main>
 
 </div>
+

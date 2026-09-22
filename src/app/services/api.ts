@@ -1,4 +1,5 @@
 
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
@@ -7,94 +8,184 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ApiService {
 
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl =
+    'http://localhost:3000/api';
 
-  constructor(private http: HttpClient) {}
 
-  // Connexion
-  connexion(email: string, motDePasse: string) {
-    return this.http.post(`${this.apiUrl}/connexion`, {
-      email,
-      motDePasse
-    });
+  constructor(
+    private http: HttpClient
+  ) {}
+
+
+  // ===============================
+  // CONNEXION
+  // ===============================
+
+  connexion(
+    email: string,
+    motDePasse: string
+  ) {
+
+    return this.http.post(
+      `${this.apiUrl}/connexion`,
+      {
+        email,
+        motDePasse
+      }
+    );
+
   }
 
-  // Utilisateurs
+
+  // ===============================
+  // UTILISATEURS
+  // ===============================
+
   getUtilisateurs() {
-    return this.http.get(`${this.apiUrl}/utilisateurs`);
+
+    return this.http.get(
+      `${this.apiUrl}/utilisateurs`
+    );
+
   }
 
-  
-// Utilisateur par ID
-getUtilisateur(id: number) {
-  return this.http.get(
-    `${this.apiUrl}/utilisateurs/${id}`
-  );
-}
 
-creerUtilisateur(donnees: any) {
-  return this.http.post(
-    `${this.apiUrl}/utilisateurs`,
-    donnees
-  );
-}
+  // ===============================
+  // UTILISATEUR PAR ID
+  // ===============================
 
-supprimerUtilisateur(id: number) {
-  return this.http.delete(
-    `${this.apiUrl}/utilisateurs/${id}`
-  );
-}
+  getUtilisateur(
+    id: number
+  ) {
 
-// Modifier un utilisateur
-modifierUtilisateur(
-  id: number,
-  donnees: any
-) {
-  return this.http.put(
-    `${this.apiUrl}/utilisateurs/${id}`,
-    donnees
-  );
-}
+    return this.http.get(
+      `${this.apiUrl}/utilisateurs/${id}`
+    );
+
+  }
 
 
+  // ===============================
+  // CRÉER UN UTILISATEUR
+  // ===============================
 
-  // Annonces
+  creerUtilisateur(
+    donnees: any
+  ) {
+
+    return this.http.post(
+      `${this.apiUrl}/utilisateurs`,
+      donnees
+    );
+
+  }
+
+
+  // ===============================
+  // MODIFIER UN UTILISATEUR
+  // ===============================
+
+  modifierUtilisateur(
+    id: number,
+    donnees: any
+  ) {
+
+    return this.http.put(
+      `${this.apiUrl}/utilisateurs/${id}`,
+      donnees
+    );
+
+  }
+
+
+  // ===============================
+  // SUPPRIMER UN UTILISATEUR
+  // ===============================
+
+  supprimerUtilisateur(
+    id: number
+  ) {
+
+    return this.http.delete(
+      `${this.apiUrl}/utilisateurs/${id}`
+    );
+
+  }
+
+
+  // ===============================
+  // ANNONCES
+  // ===============================
+
   getAnnonces() {
-    return this.http.get(`${this.apiUrl}/annonces`);
+
+    return this.http.get(
+      `${this.apiUrl}/annonces`
+    );
+
   }
 
-  creerAnnonce(donnees: {
-    titre: string;
-    contenu: string;
-    auteur_id: number;
-  }) {
+
+  // ===============================
+  // CRÉER UNE ANNONCE
+  // ===============================
+
+  creerAnnonce(
+    donnees: {
+      titre: string;
+      contenu: string;
+    }
+  ) {
+
     return this.http.post(
       `${this.apiUrl}/annonces`,
       donnees
     );
+
   }
 
-  supprimerAnnonce(id: number) {
+
+  // ===============================
+  // SUPPRIMER UNE ANNONCE
+  // ===============================
+
+  supprimerAnnonce(
+    id: number
+  ) {
+
     return this.http.delete(
       `${this.apiUrl}/annonces/${id}`
     );
+
   }
 
-  // Messages
+
+  // ===============================
+  // MESSAGES
+  // ===============================
+
   getMessages(
     utilisateur1: number,
     utilisateur2: number
   ) {
+
     return this.http.get(
       `${this.apiUrl}/messages/${utilisateur1}/${utilisateur2}`
     );
+
   }
+
+
+  // ===============================
+  // ENVOYER UN MESSAGE
+  // ===============================
 
   envoyerMessage(
     expediteur_id: number,
     destinataire_id: number,
     contenu: string
   ) {
+
     return this.http.post(
       `${this.apiUrl}/messages`,
       {
@@ -103,6 +194,8 @@ modifierUtilisateur(
         contenu
       }
     );
+
   }
 
 }
+

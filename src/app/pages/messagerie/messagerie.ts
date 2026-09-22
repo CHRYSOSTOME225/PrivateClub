@@ -63,22 +63,14 @@ export class Messagerie implements OnInit {
     this.nomUtilisateur =
       this.auth.getNom();
 
-
-    const utilisateur =
-      localStorage.getItem(
-        'utilisateurConnecte'
-      );
+    this.idUtilisateur =
+      this.auth.getId();
 
 
-    if (utilisateur) {
-
-      const donnees =
-        JSON.parse(utilisateur);
-
-      this.idUtilisateur =
-        donnees.id;
-
-    }
+    console.log(
+      'ID UTILISATEUR CONNECTÉ :',
+      this.idUtilisateur
+    );
 
 
     // Lire le membre sélectionné dans l'URL
@@ -106,7 +98,10 @@ export class Messagerie implements OnInit {
   }
 
 
-  // Charger les membres
+  // ===============================
+  // CHARGER LES MEMBRES
+  // ===============================
+
   chargerMembres() {
 
     this.api
@@ -148,7 +143,10 @@ export class Messagerie implements OnInit {
   }
 
 
-  // Filtrer les membres
+  // ===============================
+  // FILTRER LES MEMBRES
+  // ===============================
+
   get membresFiltres() {
 
     const texte =
@@ -182,7 +180,10 @@ export class Messagerie implements OnInit {
   }
 
 
-  // Sélectionner un membre
+  // ===============================
+  // SÉLECTIONNER UN MEMBRE
+  // ===============================
+
   selectionnerMembre(
     nom: string
   ) {
@@ -235,19 +236,13 @@ export class Messagerie implements OnInit {
   }
 
 
-  // Vérifier les droits
+  // ===============================
+  // VÉRIFIER LES DROITS
+  // ===============================
+
   peutContacter(
     nom: string
   ): boolean {
-
-    if (
-      nom === this.nomUtilisateur
-    ) {
-
-      return false;
-
-    }
-
 
     const membre =
       this.membres.find(
@@ -263,7 +258,22 @@ export class Messagerie implements OnInit {
     }
 
 
+    // Vérifier l'utilisateur
+    // connecté avec son ID
+    if (
+      Number(membre.id) ===
+      Number(this.idUtilisateur)
+    ) {
+
+      return false;
+
+    }
+
+
+    // ===============================
     // ADMIN
+    // ===============================
+
     if (
       this.roleUtilisateur === 'Admin'
     ) {
@@ -273,7 +283,10 @@ export class Messagerie implements OnInit {
     }
 
 
+    // ===============================
     // RESPONSABLE
+    // ===============================
+
     if (
       this.roleUtilisateur === 'Responsable'
     ) {
@@ -286,7 +299,10 @@ export class Messagerie implements OnInit {
     }
 
 
+    // ===============================
     // MEMBRE
+    // ===============================
+
     if (
       this.roleUtilisateur === 'Membre'
     ) {
@@ -304,7 +320,10 @@ export class Messagerie implements OnInit {
   }
 
 
-  // Charger les messages
+  // ===============================
+  // CHARGER LES MESSAGES
+  // ===============================
+
   chargerMessages() {
 
     if (
@@ -371,7 +390,10 @@ export class Messagerie implements OnInit {
   }
 
 
-  // Envoyer un message
+  // ===============================
+  // ENVOYER UN MESSAGE
+  // ===============================
+
   envoyerMessage() {
 
     if (
@@ -447,7 +469,10 @@ export class Messagerie implements OnInit {
   }
 
 
-  // Retour dashboard
+  // ===============================
+  // RETOUR DASHBOARD
+  // ===============================
+
   retourDashboard() {
 
     this.router.navigate(

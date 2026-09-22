@@ -28,13 +28,16 @@
           PRIVATECLUB
         </span>
 
-        <h1>Les membres</h1>
+        <h1>
+          Les membres
+        </h1>
 
         <p>
           Découvrez les membres de votre club.
         </p>
 
       </div>
+
 
       <div class="member-count">
 
@@ -67,13 +70,18 @@
 
 
     <section class="members-list">
-      
-      @for (membre of membresFiltres; track membre.id) {
+
+      @for (
+        membre of membresFiltres;
+        track membre.id
+      ) {
 
         <div class="member-card">
 
           <div class="avatar">
+
             {{ membre.nom.charAt(0) }}
+
           </div>
 
 
@@ -109,7 +117,9 @@
                 💬 Message
               </button>
 
-            } @else if (membre.nom === nomUtilisateur) {
+            }
+
+            @else if (estMonProfil(membre)) {
 
               <span class="current-user">
                 Vous

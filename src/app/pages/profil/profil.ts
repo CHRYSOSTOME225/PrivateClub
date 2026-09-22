@@ -60,27 +60,18 @@ export class Profil implements OnInit {
 
   ngOnInit() {
 
-    const utilisateur =
-      localStorage.getItem(
-        'utilisateurConnecte'
-      );
+    // Récupérer l'ID depuis Auth
+    this.idUtilisateur =
+      this.auth.getId();
 
 
-    if (!utilisateur) {
+    if (!this.idUtilisateur) {
 
       this.router.navigate(['/']);
 
       return;
 
     }
-
-
-    const donnees =
-      JSON.parse(utilisateur);
-
-
-    this.idUtilisateur =
-      donnees.id;
 
 
     this.chargerProfil();
@@ -264,7 +255,7 @@ export class Profil implements OnInit {
         donneesUtilisateur.role,
 
       departement:
-        this.departement.trim(),
+        donneesUtilisateur.departement,
 
       telephone:
         this.telephone.trim(),

@@ -2,20 +2,34 @@
 
   <header class="topbar">
 
-    <img src="/logo.png" alt="PrivateClub" class="logo">
+    <img
+      src="/logo.png"
+      alt="PrivateClub"
+      class="logo"
+    >
 
-    <button class="back-button" (click)="retourDashboard()">
+    <button
+      class="back-button"
+      (click)="retourDashboard()"
+    >
       Retour au Dashboard
     </button>
 
   </header>
 
+
   <main class="content">
 
-    <h1>Les annonces</h1>
+    <h1>
+      Les annonces
+    </h1>
 
-    <p>Découvrez les annonces publiées sur PrivateClub.</p>
+    <p>
+      Découvrez les annonces publiées sur PrivateClub.
+    </p>
 
+
+    <!-- MESSAGE -->
 
     @if (message !== '') {
 
@@ -26,7 +40,9 @@
     }
 
 
-    @if (roleUtilisateur === 'Admin' || roleUtilisateur === 'Responsable') {
+    <!-- PUBLICATION ADMIN -->
+
+    @if (roleUtilisateur === 'Admin') {
 
       <div class="publication-box">
 
@@ -35,22 +51,30 @@
         </div>
 
         <div class="publication-info">
-          <h2>Publier une annonce</h2>
-          <p>Partagez une information avec les membres du club.</p>
+
+          <h2>
+            Publier une annonce
+          </h2>
+
+          <p>
+            Partagez une information avec les membres du club.
+          </p>
+
         </div>
 
         <button
           class="publish-button"
-          (click)="ouvrirFormulaire()">
-
+          (click)="ouvrirFormulaire()"
+        >
           + Nouvelle annonce
-
         </button>
 
       </div>
 
     }
 
+
+    <!-- FORMULAIRE -->
 
     @if (formulaireVisible) {
 
@@ -59,11 +83,15 @@
         <div class="form-header">
 
           <div>
+
             <span class="form-label">
               NOUVELLE PUBLICATION
             </span>
 
-            <h2>Publier une annonce</h2>
+            <h2>
+              Publier une annonce
+            </h2>
+
           </div>
 
           <span class="form-icon">
@@ -90,19 +118,17 @@
 
           <button
             class="cancel-button"
-            (click)="formulaireVisible = false">
-
+            (click)="formulaireVisible = false"
+          >
             Annuler
-
           </button>
 
 
           <button
             class="submit-button"
-            (click)="publierAnnonce()">
-
+            (click)="publierAnnonce()"
+          >
             Publier l'annonce →
-
           </button>
 
         </div>
@@ -112,7 +138,12 @@
     }
 
 
-    @for (annonce of annonces; track annonce.id) {
+    <!-- LISTE DES ANNONCES -->
+
+    @for (
+      annonce of annonces;
+      track annonce.id
+    ) {
 
       <div class="annonce-card">
 
@@ -133,20 +164,15 @@
         </span>
 
 
-        @if (
-          roleUtilisateur === 'Admin' ||
-          (
-            roleUtilisateur === 'Responsable' &&
-            annonce.auteur === auth.getNom()
-          )
-        ) {
+        <!-- SUPPRESSION ADMIN -->
+
+        @if (roleUtilisateur === 'Admin') {
 
           <button
             class="delete-button"
-            (click)="supprimerAnnonce(annonce.id)">
-
+            (click)="supprimerAnnonce(annonce.id)"
+          >
             🗑️ Supprimer
-
           </button>
 
         }
@@ -156,11 +182,15 @@
     }
 
 
+    <!-- AUCUNE ANNONCE -->
+
     @if (annonces.length === 0) {
 
       <div class="no-annonces">
 
-        <h2>Aucune annonce</h2>
+        <h2>
+          Aucune annonce
+        </h2>
 
         <p>
           Aucune annonce n'a encore été publiée.

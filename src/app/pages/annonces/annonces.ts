@@ -1,9 +1,10 @@
+
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { Auth } from '../../services/auth';
+import { ApiService } from '../../services/api';
 
 @Component({
   selector: 'app-annonces',
@@ -24,14 +25,11 @@ export class Annonces {
 
   message = '';
 
-  private apiUrl =
-    'http://localhost:3000/api/annonces';
-
 
   constructor(
     private router: Router,
     public auth: Auth,
-    private http: HttpClient,
+    private api: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -46,16 +44,20 @@ export class Annonces {
   }
 
 
-  // Charger les annonces depuis MySQL
+  // ===============================
+  // CHARGER LES ANNONCES
+  // ===============================
+
   chargerAnnonces() {
 
-    this.http
-      .get<any[]>(this.apiUrl)
+    this.api
+      .getAnnonces()
       .subscribe({
 
-        next: (resultats) => {
+        next: (resultats: any) => {
 
-          this.annonces = resultats;
+          this.annonces =
+            resultats;
 
           this.cdr.detectChanges();
 
@@ -78,7 +80,10 @@ export class Annonces {
   }
 
 
-  // Ouvrir le formulaire
+  // ===============================
+  // OUVRIR LE FORMULAIRE
+  // ===============================
+
   ouvrirFormulaire() {
 
     this.nouveauTitre = '';
@@ -87,12 +92,16 @@ export class Annonces {
 
     this.message = '';
 
-    this.formulaireVisible = true;
+    this.formulaireVisible =
+      true;
 
   }
 
 
-  // Publier une annonce
+  // ===============================
+  // PUBLIER UNE ANNONCE
+  // ===============================
+
   publierAnnonce() {
 
     if (
@@ -108,25 +117,10 @@ export class Annonces {
     }
 
 
-    const utilisateur =
-      localStorage.getItem(
-        'utilisateurConnecte'
-      );
-
-
-    if (!utilisateur) {
-
-      this.message =
-        'Utilisateur non connecté.';
-
-      return;
-
-    }
-
-
-    const donneesUtilisateur =
-      JSON.parse(utilisateur);
-
+    // L'ID de l'auteur n'est plus
+    // envoyé depuis le frontend.
+    // Le backend récupère automatiquement
+    // l'Admin connecté grâce au JWT.
 
     const donnees = {
 
@@ -134,19 +128,13 @@ export class Annonces {
         this.nouveauTitre.trim(),
 
       contenu:
-        this.nouveauContenu.trim(),
-
-      auteur_id:
-        donneesUtilisateur.id
+        this.nouveauContenu.trim()
 
     };
 
 
-    this.http
-      .post(
-        this.apiUrl,
-        donnees
-      )
+    this.api
+      .creerAnnonce(donnees)
       .subscribe({
 
         next: () => {
@@ -155,7 +143,8 @@ export class Annonces {
 
           this.nouveauContenu = '';
 
-          this.formulaireVisible = false;
+          this.formulaireVisible =
+            false;
 
           this.message = '';
 
@@ -170,8 +159,31 @@ export class Annonces {
             erreur
           );
 
-          this.message =
-            'Erreur lors de la publication.';
+
+          if (
+            erreur.status === 401
+          ) {
+
+            this.message =
+              'Vous devez être connecté pour publier une annonce.';
+
+          }
+
+          else if (
+            erreur.status === 403
+          ) {
+
+            this.message =
+              'Seul un Admin peut publier une annonce.';
+
+          }
+
+          else {
+
+            this.message =
+              'Erreur lors de la publication.';
+
+          }
 
         }
 
@@ -180,7 +192,10 @@ export class Annonces {
   }
 
 
-  // Supprimer une annonce
+  // ===============================
+  // SUPPRIMER UNE ANNONCE
+  // ===============================
+
   supprimerAnnonce(
     id: number
   ) {
@@ -198,10 +213,8 @@ export class Annonces {
     }
 
 
-    this.http
-      .delete(
-        `${this.apiUrl}/${id}`
-      )
+    this.api
+      .supprimerAnnonce(id)
       .subscribe({
 
         next: () => {
@@ -219,8 +232,22 @@ export class Annonces {
             erreur
           );
 
-          this.message =
-            'Erreur lors de la suppression.';
+
+          if (
+            erreur.status === 403
+          ) {
+
+            this.message =
+              'Seul un Admin peut supprimer une annonce.';
+
+          }
+
+          else {
+
+            this.message =
+              'Erreur lors de la suppression.';
+
+          }
 
         }
 
@@ -229,7 +256,10 @@ export class Annonces {
   }
 
 
-  // Retour au dashboard
+  // ===============================
+  // RETOUR DASHBOARD
+  // ===============================
+
   retourDashboard() {
 
     this.router.navigate(
@@ -239,3 +269,4 @@ export class Annonces {
   }
 
 }
+
