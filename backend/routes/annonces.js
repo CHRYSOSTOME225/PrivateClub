@@ -1,8 +1,14 @@
+const verifierToken = require("../middleware/auth");
+const verifierAdmin = require("../middleware/admin");
+
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
 
-// GET : récupérer toutes les annonces
+// ===============================
+// RÉCUPÉRER TOUTES LES ANNONCES
+// ===============================
+
 router.get("/", (req, res) => {
 
     const sql = `
@@ -22,103 +28,163 @@ router.get("/", (req, res) => {
     db.query(sql, (err, resultats) => {
 
         if (err) {
+
             console.error(err);
 
             return res.status(500).json({
-                message: "Erreur lors de la récupération des annonces"
+                message:
+                    "Erreur lors de la récupération des annonces"
             });
+
         }
 
         res.json(resultats);
+
     });
+
 });
 
 
-// POST : créer une annonce
-router.post("/", (req, res) => {
+// ===============================
+// CRÉER UNE ANNONCE
+// ===============================
 
-    const {
-        titre,
-        contenu,
-        auteur_id
-    } = req.body;
+router.post(
+    "/",
+    verifierToken,
+    verifierAdmin,
+    (req, res) => {
 
-    if (
-        !titre ||
-        !contenu ||
-        !auteur_id
-    ) {
-        return res.status(400).json({
-            message: "Tous les champs sont obligatoires"
-        });
+        const {
+            titre,
+            contenu
+        } = req.body;
+
+
+        if (
+            !titre ||
+            !contenu ||
+            titre.trim() === "" ||
+            contenu.trim() === ""
+        ) {
+
+            return res.status(400).json({
+                message:
+                    "Le titre et le contenu sont obligatoires"
+            });
+
+        }
+
+
+        // L'auteur est automatiquement
+        // l'Admin connecté.
+        const auteur_id =
+            req.utilisateur.id;
+
+
+        const sql = `
+            INSERT INTO annonces
+            (
+                titre,
+                contenu,
+                auteur_id
+            )
+            VALUES (?, ?, ?)
+        `;
+
+
+        db.query(
+            sql,
+            [
+                titre.trim(),
+                contenu.trim(),
+                auteur_id
+            ],
+            (err, resultat) => {
+
+                if (err) {
+
+                    console.error(err);
+
+                    return res.status(500).json({
+                        message:
+                            "Erreur lors de la création de l'annonce"
+                    });
+
+                }
+
+
+                res.status(201).json({
+
+                    message:
+                        "Annonce créée avec succès",
+
+                    id:
+                        resultat.insertId
+
+                });
+
+            }
+        );
+
     }
+);
 
-    const sql = `
-        INSERT INTO annonces
-        (
-            titre,
-            contenu,
-            auteur_id
-        )
-        VALUES (?, ?, ?)
-    `;
 
-    db.query(
-        sql,
-        [
-            titre,
-            contenu,
-            auteur_id
-        ],
-        (err, resultat) => {
+// ===============================
+// SUPPRIMER UNE ANNONCE
+// ===============================
 
-            if (err) {
-                console.error(err);
+router.delete(
+    "/:id",
+    verifierToken,
+    verifierAdmin,
+    (req, res) => {
 
-                return res.status(500).json({
-                    message: "Erreur lors de la création de l'annonce"
+        const id = req.params.id;
+
+
+        db.query(
+            "DELETE FROM annonces WHERE id = ?",
+            [id],
+            (err, resultat) => {
+
+                if (err) {
+
+                    console.error(err);
+
+                    return res.status(500).json({
+                        message:
+                            "Erreur lors de la suppression de l'annonce"
+                    });
+
+                }
+
+
+                if (
+                    resultat.affectedRows === 0
+                ) {
+
+                    return res.status(404).json({
+                        message:
+                            "Annonce introuvable"
+                    });
+
+                }
+
+
+                res.json({
+
+                    message:
+                        "Annonce supprimée avec succès"
+
                 });
+
             }
+        );
 
-            res.status(201).json({
-                message: "Annonce créée avec succès",
-                id: resultat.insertId
-            });
-        }
-    );
-});
-
-
-// DELETE : supprimer une annonce
-router.delete("/:id", (req, res) => {
-
-    const id = req.params.id;
-
-    db.query(
-        "DELETE FROM annonces WHERE id = ?",
-        [id],
-        (err, resultat) => {
-
-            if (err) {
-                console.error(err);
-
-                return res.status(500).json({
-                    message: "Erreur lors de la suppression de l'annonce"
-                });
-            }
-
-            if (resultat.affectedRows === 0) {
-                return res.status(404).json({
-                    message: "Annonce introuvable"
-                });
-            }
-
-            res.json({
-                message: "Annonce supprimée avec succès"
-            });
-        }
-    );
-});
+    }
+);
 
 
 module.exports = router;

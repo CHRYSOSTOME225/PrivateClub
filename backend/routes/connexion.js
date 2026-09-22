@@ -6,78 +6,194 @@ const db = require("../db");
 
 const SECRET = "privateclub_secret_2026";
 
-router.post("/", (req, res) => {
 
-    const { email, motDePasse } = req.body;
+// ===============================
+// CONNEXION
+// ===============================
 
-    if (!email || !motDePasse) {
+router.post("/", async (req, res) => {
+
+    const {
+        email,
+        motDePasse
+    } = req.body;
+
+
+    // ===============================
+    // VÉRIFICATION DES CHAMPS
+    // ===============================
+
+    if (
+        !email ||
+        !motDePasse ||
+        email.trim() === "" ||
+        motDePasse.trim() === ""
+    ) {
+
         return res.status(400).json({
-            message: "Email et mot de passe obligatoires"
+            message:
+                "Email et mot de passe obligatoires"
         });
+
     }
 
-    const sql =
-        "SELECT * FROM utilisateurs WHERE email = ?";
 
-    db.query(sql, [email], async (err, resultats) => {
+    const emailNormalise =
+        email.trim().toLowerCase();
 
-        if (err) {
-            console.error(err);
 
-            return res.status(500).json({
-                message: "Erreur serveur"
-            });
-        }
+    // ===============================
+    // RECHERCHER L'UTILISATEUR
+    // ===============================
 
-        if (resultats.length === 0) {
-            return res.status(401).json({
-                message: "Email ou mot de passe incorrect"
-            });
-        }
+    const sql = `
+        SELECT *
+        FROM utilisateurs
+        WHERE email = ?
+    `;
 
-        const utilisateur = resultats[0];
 
-        const motDePasseCorrect =
-            await bcrypt.compare(
-                motDePasse,
-                utilisateur.mot_de_passe
-            );
+    db.query(
+        sql,
+        [emailNormalise],
+        async (err, resultats) => {
 
-        if (!motDePasseCorrect) {
-            return res.status(401).json({
-                message: "Email ou mot de passe incorrect"
-            });
-        }
+            if (err) {
 
-        // Création du token
-        const token = jwt.sign(
-            {
-                id: utilisateur.id,
-                role: utilisateur.role
-            },
-            SECRET,
-            {
-                expiresIn: "2h"
+                console.error(err);
+
+                return res.status(500).json({
+                    message:
+                        "Erreur serveur"
+                });
+
             }
-        );
 
-        res.json({
-            message: "Connexion réussie",
 
-            token: token,
+            // ===============================
+            // UTILISATEUR INTROUVABLE
+            // ===============================
 
-            utilisateur: {
-                id: utilisateur.id,
-                nom: utilisateur.nom,
-                email: utilisateur.email,
-                role: utilisateur.role,
-                departement: utilisateur.departement,
-                poste: utilisateur.poste,
-                telephone: utilisateur.telephone,
-                photo: utilisateur.photo
+            if (
+                resultats.length === 0
+            ) {
+
+                return res.status(401).json({
+                    message:
+                        "Email ou mot de passe incorrect"
+                });
+
             }
-        });
-    });
+
+
+            const utilisateur =
+                resultats[0];
+
+
+            // ===============================
+            // VÉRIFICATION DU MOT DE PASSE
+            // ===============================
+
+            try {
+
+                const motDePasseCorrect =
+                    await bcrypt.compare(
+                        motDePasse,
+                        utilisateur.mot_de_passe
+                    );
+
+
+                if (!motDePasseCorrect) {
+
+                    return res.status(401).json({
+                        message:
+                            "Email ou mot de passe incorrect"
+                    });
+
+                }
+
+
+                // ===============================
+                // CRÉATION DU TOKEN JWT
+                // ===============================
+
+                const token =
+                    jwt.sign(
+                        {
+                            id:
+                                utilisateur.id,
+
+                            role:
+                                utilisateur.role
+                        },
+                        SECRET,
+                        {
+                            expiresIn:
+                                "2h"
+                        }
+                    );
+
+
+                // ===============================
+                // RÉPONSE
+                // ===============================
+
+                res.json({
+
+                    message:
+                        "Connexion réussie",
+
+                    token:
+                        token,
+
+                    utilisateur: {
+
+                        id:
+                            utilisateur.id,
+
+                        nom:
+                            utilisateur.nom,
+
+                        email:
+                            utilisateur.email,
+
+                        role:
+                            utilisateur.role,
+
+                        departement:
+                            utilisateur.departement,
+
+                        poste:
+                            utilisateur.poste,
+
+                        telephone:
+                            utilisateur.telephone,
+
+                        photo:
+                            utilisateur.photo
+
+                    }
+
+                });
+
+            } catch (erreur) {
+
+                console.error(
+                    "Erreur bcrypt :",
+                    erreur
+                );
+
+                return res.status(500).json({
+                    message:
+                        "Erreur lors de la vérification du mot de passe"
+                });
+
+            }
+
+        }
+    );
+
 });
+
 
 module.exports = router;

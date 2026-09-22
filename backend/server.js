@@ -25,6 +25,16 @@ app.get("/", (req, res) => {
         message: "Bienvenue sur l'API PrivateClub"
     });
 });
+ 
+const verifierToken = require("./middleware/auth");
+
+app.get("/api/test-protection", verifierToken, (req, res) => {
+    res.json({
+        message: "Token valide",
+        utilisateur: req.utilisateur
+    });
+});
+
 
 // Démarrage du serveur
 app.listen(PORT, () => {
