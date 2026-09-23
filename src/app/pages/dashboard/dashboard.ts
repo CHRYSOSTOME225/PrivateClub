@@ -129,7 +129,32 @@ export class Dashboard implements OnInit {
     // MESSAGES
     // ==============================
 
-    this.nombreMessages = 0;
+    this.api
+      .getNombreMessages()
+      .subscribe({
+        next: (resultat: any) => {
+
+          console.log(
+            'DASHBOARD - nombre de messages :',
+            resultat.nombre
+          );
+
+          this.nombreMessages =
+            resultat.nombre;
+
+          this.cdr.detectChanges();
+        },
+
+        error: (erreur: any) => {
+
+          console.error(
+            'ERREUR DASHBOARD MESSAGES :',
+            erreur
+          );
+
+        }
+      });
+
   }
 
 

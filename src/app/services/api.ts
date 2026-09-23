@@ -176,6 +176,14 @@ export class ApiService {
   }
 
 
+  getNombreMessages() {
+
+  return this.http.get(
+    `${this.apiUrl}/messages/compteur`
+  );
+
+}
+
   // ===============================
   // ENVOYER UN MESSAGE
   // ===============================

@@ -6,6 +6,41 @@ const db = require("../db");
 
 
 // ===============================
+// VÉRIFIER LES DROITS DE CONTACT
+// ===============================
+
+function peutContacter(roleExpediteur, roleDestinataire) {
+
+    // Admin peut contacter tout le monde
+    if (roleExpediteur === "Admin") {
+        return true;
+    }
+
+    // Responsable peut contacter Admin et Membres
+    if (roleExpediteur === "Responsable") {
+
+        return (
+            roleDestinataire === "Admin" ||
+            roleDestinataire === "Membre"
+        );
+
+    }
+
+    // Membre peut contacter Responsable et Membres
+    if (roleExpediteur === "Membre") {
+
+        return (
+            roleDestinataire === "Responsable" ||
+            roleDestinataire === "Membre"
+        );
+
+    }
+
+    return false;
+}
+
+
+// ===============================
 // RÉCUPÉRER UNE CONVERSATION
 // ===============================
 
@@ -25,11 +60,10 @@ router.get(
 
 
         // Vérifier que l'utilisateur connecté
-        // participe bien à la conversation
+        // participe à la conversation
         if (
             utilisateurConnecte !== utilisateur1 &&
-            utilisateurConnecte !== utilisateur2 &&
-            req.utilisateur.role !== "Admin"
+            utilisateurConnecte !== utilisateur2
         ) {
 
             return res.status(403).json({
@@ -118,8 +152,10 @@ router.post(
         } = req.body;
 
 
-        // L'expéditeur doit être
-        // l'utilisateur connecté
+        // ===============================
+        // VÉRIFIER L'EXPÉDITEUR
+        // ===============================
+
         if (
             Number(expediteur_id) !==
             Number(req.utilisateur.id)
@@ -132,6 +168,10 @@ router.post(
 
         }
 
+
+        // ===============================
+        // VÉRIFIER LES CHAMPS
+        // ===============================
 
         if (
             !expediteur_id ||
@@ -148,7 +188,10 @@ router.post(
         }
 
 
-        // Empêcher l'envoi à soi-même
+        // ===============================
+        // EMPÊCHER L'AUTO-MESSAGE
+        // ===============================
+
         if (
             Number(expediteur_id) ===
             Number(destinataire_id)
@@ -162,25 +205,23 @@ router.post(
         }
 
 
-        const sql = `
-            INSERT INTO messages
-            (
-                expediteur_id,
-                destinataire_id,
-                contenu
-            )
-            VALUES (?, ?, ?)
+        // ===============================
+        // RÉCUPÉRER LE DESTINATAIRE
+        // ===============================
+
+        const sqlUtilisateur = `
+            SELECT
+                id,
+                role
+            FROM utilisateurs
+            WHERE id = ?
         `;
 
 
         db.query(
-            sql,
-            [
-                expediteur_id,
-                destinataire_id,
-                contenu.trim()
-            ],
-            (err, resultat) => {
+            sqlUtilisateur,
+            [destinataire_id],
+            (err, resultats) => {
 
                 if (err) {
 
@@ -188,21 +229,95 @@ router.post(
 
                     return res.status(500).json({
                         message:
-                            "Erreur lors de l'envoi du message"
+                            "Erreur lors de la vérification du destinataire"
                     });
 
                 }
 
 
-                res.status(201).json({
+                if (
+                    resultats.length === 0
+                ) {
 
-                    message:
-                        "Message envoyé avec succès",
+                    return res.status(404).json({
+                        message:
+                            "Destinataire introuvable"
+                    });
 
-                    id:
-                        resultat.insertId
+                }
 
-                });
+
+                const roleDestinataire =
+                    resultats[0].role;
+
+
+                // ===============================
+                // VÉRIFIER LA HIÉRARCHIE
+                // ===============================
+
+                if (
+                    !peutContacter(
+                        req.utilisateur.role,
+                        roleDestinataire
+                    )
+                ) {
+
+                    return res.status(403).json({
+                        message:
+                            "Vous n'avez pas l'autorisation de contacter cet utilisateur"
+                    });
+
+                }
+
+
+                // ===============================
+                // ENREGISTRER LE MESSAGE
+                // ===============================
+
+                const sql = `
+                    INSERT INTO messages
+                    (
+                        expediteur_id,
+                        destinataire_id,
+                        contenu
+                    )
+                    VALUES (?, ?, ?)
+                `;
+
+
+                db.query(
+                    sql,
+                    [
+                        expediteur_id,
+                        destinataire_id,
+                        contenu.trim()
+                    ],
+                    (err, resultat) => {
+
+                        if (err) {
+
+                            console.error(err);
+
+                            return res.status(500).json({
+                                message:
+                                    "Erreur lors de l'envoi du message"
+                            });
+
+                        }
+
+
+                        res.status(201).json({
+
+                            message:
+                                "Message envoyé avec succès",
+
+                            id:
+                                resultat.insertId
+
+                        });
+
+                    }
+                );
 
             }
         );
@@ -210,5 +325,54 @@ router.post(
     }
 );
 
+// ===============================
+// COMPTER LES MESSAGES DE L'UTILISATEUR
+// ===============================
+
+router.get(
+    "/compteur",
+    verifierToken,
+    (req, res) => {
+
+        const utilisateurId =
+            Number(req.utilisateur.id);
+
+        const sql = `
+            SELECT COUNT(*) AS nombre
+            FROM messages
+            WHERE
+                expediteur_id = ?
+                OR destinataire_id = ?
+        `;
+
+        db.query(
+            sql,
+            [
+                utilisateurId,
+                utilisateurId
+            ],
+            (err, resultats) => {
+
+                if (err) {
+
+                    console.error(err);
+
+                    return res.status(500).json({
+                        message:
+                            "Erreur lors du comptage des messages"
+                    });
+
+                }
+
+                res.json({
+                    nombre:
+                        resultats[0].nombre
+                });
+
+            }
+        );
+
+    }
+);
 
 module.exports = router;
