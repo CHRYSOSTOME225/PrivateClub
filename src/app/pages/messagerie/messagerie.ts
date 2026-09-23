@@ -418,6 +418,41 @@ export class Messagerie implements OnInit {
     );
 
 
+    // ===============================
+    // MARQUER LES MESSAGES COMME LUS
+    // ===============================
+
+    this.api
+      .marquerMessagesLus(
+        membre.id
+      )
+      .subscribe({
+
+        next: (resultat: any) => {
+
+          console.log(
+            'MESSAGES MARQUÉS COMME LUS :',
+            resultat.nombre
+          );
+
+        },
+
+        error: (erreur: any) => {
+
+          console.error(
+            'ERREUR MARQUAGE MESSAGES :',
+            erreur
+          );
+
+        }
+
+      });
+
+
+    // ===============================
+    // CHARGER LA CONVERSATION
+    // ===============================
+
     this.api
       .getMessages(
         this.idUtilisateur,

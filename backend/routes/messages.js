@@ -81,6 +81,7 @@ router.get(
                 messages.destinataire_id,
                 messages.contenu,
                 messages.date_envoi,
+                messages.lu,
                 expediteur.nom AS expediteur,
                 destinataire.nom AS destinataire
             FROM messages
@@ -279,9 +280,10 @@ router.post(
                     (
                         expediteur_id,
                         destinataire_id,
-                        contenu
+                        contenu,
+                        lu
                     )
-                    VALUES (?, ?, ?)
+                    VALUES (?, ?, ?, FALSE)
                 `;
 
 
@@ -325,8 +327,9 @@ router.post(
     }
 );
 
+
 // ===============================
-// COMPTER LES MESSAGES DE L'UTILISATEUR
+// COMPTER LES MESSAGES NON LUS
 // ===============================
 
 router.get(
@@ -341,14 +344,13 @@ router.get(
             SELECT COUNT(*) AS nombre
             FROM messages
             WHERE
-                expediteur_id = ?
-                OR destinataire_id = ?
+                destinataire_id = ?
+                AND lu = FALSE
         `;
 
         db.query(
             sql,
             [
-                utilisateurId,
                 utilisateurId
             ],
             (err, resultats) => {
@@ -359,7 +361,7 @@ router.get(
 
                     return res.status(500).json({
                         message:
-                            "Erreur lors du comptage des messages"
+                            "Erreur lors du comptage des messages non lus"
                     });
 
                 }
@@ -374,5 +376,81 @@ router.get(
 
     }
 );
+
+// ===============================
+// MARQUER UNE CONVERSATION COMME LUE
+// ===============================
+
+router.put(
+    "/lu/:utilisateur",
+    verifierToken,
+    (req, res) => {
+
+        const utilisateurConnecte =
+            Number(req.utilisateur.id);
+
+        const autreUtilisateur =
+            Number(req.params.utilisateur);
+
+
+        // Empêcher de modifier les messages
+        // d'une autre personne
+        if (
+            !autreUtilisateur ||
+            autreUtilisateur === utilisateurConnecte
+        ) {
+
+            return res.status(400).json({
+                message:
+                    "Utilisateur invalide"
+            });
+
+        }
+
+
+        const sql = `
+            UPDATE messages
+            SET lu = TRUE
+            WHERE
+                expediteur_id = ?
+                AND destinataire_id = ?
+                AND lu = FALSE
+        `;
+
+
+        db.query(
+            sql,
+            [
+                autreUtilisateur,
+                utilisateurConnecte
+            ],
+            (err, resultat) => {
+
+                if (err) {
+
+                    console.error(err);
+
+                    return res.status(500).json({
+                        message:
+                            "Erreur lors du marquage des messages"
+                    });
+
+                }
+
+
+                res.json({
+                    message:
+                        "Messages marqués comme lus",
+
+                    nombre:
+                        resultat.affectedRows
+                });
+
+            }
+        );
+
+    }
+);
+
 
 module.exports = router;

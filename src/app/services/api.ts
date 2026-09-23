@@ -184,6 +184,15 @@ export class ApiService {
 
 }
 
+marquerMessagesLus(
+  utilisateurId: number
+) {
+  return this.http.put(
+    `${this.apiUrl}/messages/lu/${utilisateurId}`,
+    {}
+  );
+}
+
   // ===============================
   // ENVOYER UN MESSAGE
   // ===============================
