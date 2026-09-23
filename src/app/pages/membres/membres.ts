@@ -215,15 +215,19 @@ export class Membres {
   }
 
 
+  // ===============================
+  // OUVRIR LA MESSAGERIE
+  // ===============================
+
   ouvrirMessagerie(
-    nom: string
+    id: number
   ) {
 
     this.router.navigate(
       ['/messagerie'],
       {
         queryParams: {
-          membre: nom
+          id: id
         }
       }
     );

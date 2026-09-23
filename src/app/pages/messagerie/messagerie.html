@@ -61,18 +61,20 @@
           track membre.id
         ) {
 
-          @if (peutContacter(membre.nom)) {
+          @if (peutContacter(membre.id)) {
 
             <button
               class="member-item"
               [class.active]="
-                membreSelectionne === membre.nom
+                idMembreSelectionne === membre.id
               "
-              (click)="selectionnerMembre(membre.nom)"
+              (click)="selectionnerMembre(membre.id)"
             >
 
               <div class="avatar">
+
                 {{ membre.nom.charAt(0) }}
+
               </div>
 
 
@@ -115,7 +117,9 @@
           <div class="conversation-user">
 
             <div class="avatar large">
+
               {{ membreSelectionne.charAt(0) }}
+
             </div>
 
             <div>
@@ -141,7 +145,9 @@
           @if (messageErreur !== '') {
 
             <div class="message-error">
+
               {{ messageErreur }}
+
             </div>
 
           }
@@ -160,8 +166,10 @@
               </h3>
 
               <p>
+
                 Commencez la conversation avec
                 {{ membreSelectionne }}.
+
               </p>
 
             </div>
@@ -207,7 +215,10 @@
 
         <!-- CHAMP D'ENVOI -->
 
-        @if (peutContacter(membreSelectionne)) {
+        @if (
+          idMembreSelectionne &&
+          peutContacter(idMembreSelectionne)
+        ) {
 
           <div class="message-input">
 
@@ -242,8 +253,10 @@
           </h2>
 
           <p>
+
             Sélectionnez un membre pour commencer
             une conversation.
+
           </p>
 
         </div>

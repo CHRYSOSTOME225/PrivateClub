@@ -1,4 +1,3 @@
-
 import {
   Component,
   OnInit,
@@ -29,11 +28,13 @@ export class Messagerie implements OnInit {
 
   membreSelectionne = '';
 
+  idMembreSelectionne: number | null = null;
+
   roleUtilisateur = '';
 
   nomUtilisateur = '';
 
-  idUtilisateur = 0;
+  idUtilisateur: any = null;
 
   recherche = '';
 
@@ -73,17 +74,20 @@ export class Messagerie implements OnInit {
     );
 
 
-    // Lire le membre sélectionné dans l'URL
+    // ===============================
+    // LIRE L'ID DU MEMBRE DANS L'URL
+    // ===============================
+
     this.route.queryParams.subscribe(
       params => {
 
-        const membre =
-          params['membre'];
+        const id =
+          Number(params['id']);
 
-        if (membre) {
+        if (id) {
 
-          this.membreSelectionne =
-            membre;
+          this.idMembreSelectionne =
+            id;
 
         }
 
@@ -113,11 +117,13 @@ export class Messagerie implements OnInit {
           this.membres =
             resultats;
 
+          this.mettreAJourMembreSelectionne();
+
           this.cdr.detectChanges();
 
 
           if (
-            this.membreSelectionne
+            this.idMembreSelectionne
           ) {
 
             this.chargerMessages();
@@ -139,6 +145,39 @@ export class Messagerie implements OnInit {
         }
 
       });
+
+  }
+
+
+  // ===============================
+  // METTRE À JOUR LE MEMBRE SÉLECTIONNÉ
+  // ===============================
+
+  mettreAJourMembreSelectionne() {
+
+    if (
+      !this.idMembreSelectionne
+    ) {
+
+      return;
+
+    }
+
+
+    const membre =
+      this.membres.find(
+        m =>
+          Number(m.id) ===
+          this.idMembreSelectionne
+      );
+
+
+    if (membre) {
+
+      this.membreSelectionne =
+        membre.nom;
+
+    }
 
   }
 
@@ -185,17 +224,34 @@ export class Messagerie implements OnInit {
   // ===============================
 
   selectionnerMembre(
-    nom: string
+    id: number
   ) {
+
+    const membre =
+      this.membres.find(
+        m =>
+          Number(m.id) ===
+          Number(id)
+      );
+
+
+    if (!membre) {
+
+      return;
+
+    }
+
 
     console.log(
       'MEMBRE CLIQUÉ :',
-      nom
+      membre.nom
     );
 
 
     if (
-      !this.peutContacter(nom)
+      !this.peutContacter(
+        membre.id
+      )
     ) {
 
       console.log(
@@ -207,8 +263,11 @@ export class Messagerie implements OnInit {
     }
 
 
+    this.idMembreSelectionne =
+      Number(membre.id);
+
     this.membreSelectionne =
-      nom;
+      membre.nom;
 
     this.nouveauMessage =
       '';
@@ -223,7 +282,7 @@ export class Messagerie implements OnInit {
       ['/messagerie'],
       {
         queryParams: {
-          membre: nom
+          id: membre.id
         }
       }
     );
@@ -241,13 +300,14 @@ export class Messagerie implements OnInit {
   // ===============================
 
   peutContacter(
-    nom: string
+    id: number
   ): boolean {
 
     const membre =
       this.membres.find(
         m =>
-          m.nom === nom
+          Number(m.id) ===
+          Number(id)
       );
 
 
@@ -258,8 +318,7 @@ export class Messagerie implements OnInit {
     }
 
 
-    // Vérifier l'utilisateur
-    // connecté avec son ID
+    // Impossible de se contacter soi-même
     if (
       Number(membre.id) ===
       Number(this.idUtilisateur)
@@ -327,7 +386,7 @@ export class Messagerie implements OnInit {
   chargerMessages() {
 
     if (
-      !this.membreSelectionne ||
+      !this.idMembreSelectionne ||
       !this.idUtilisateur
     ) {
 
@@ -339,8 +398,8 @@ export class Messagerie implements OnInit {
     const membre =
       this.membres.find(
         m =>
-          m.nom ===
-          this.membreSelectionne
+          Number(m.id) ===
+          Number(this.idMembreSelectionne)
       );
 
 
@@ -353,7 +412,9 @@ export class Messagerie implements OnInit {
 
     console.log(
       'CHARGEMENT CONVERSATION AVEC :',
-      membre.nom
+      membre.nom,
+      'ID :',
+      membre.id
     );
 
 
@@ -397,7 +458,7 @@ export class Messagerie implements OnInit {
   envoyerMessage() {
 
     if (
-      !this.membreSelectionne ||
+      !this.idMembreSelectionne ||
       this.nouveauMessage.trim() === ''
     ) {
 
@@ -408,7 +469,7 @@ export class Messagerie implements OnInit {
 
     if (
       !this.peutContacter(
-        this.membreSelectionne
+        this.idMembreSelectionne
       )
     ) {
 
@@ -420,8 +481,8 @@ export class Messagerie implements OnInit {
     const membre =
       this.membres.find(
         m =>
-          m.nom ===
-          this.membreSelectionne
+          Number(m.id) ===
+          Number(this.idMembreSelectionne)
       );
 
 
