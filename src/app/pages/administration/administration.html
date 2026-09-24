@@ -1,448 +1,569 @@
-
 <div class="administration-page">
 
-  <!-- BARRE DU HAUT -->
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
 
-  <header class="topbar">
-
-    <img
-      src="/logo.png"
-      alt="PrivateClub"
-      class="logo"
-    >
-
-    <div class="topbar-right">
-
-      <span class="admin-badge">
-        ⚙️ Administration
-      </span>
-
-      <button
-        class="back-button"
-        (click)="retourDashboard()">
-
-        Dashboard
-
-      </button>
-
+    <div class="sidebar-logo">
+      <img src="/logo.png" alt="PrivateClub">
     </div>
 
-  </header>
+    <nav class="sidebar-nav">
+
+      <button
+        type="button"
+        (click)="allerAccueil()"
+      >
+        🏠
+        <span>Accueil</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="allerMembres()"
+      >
+        👥
+        <span>Membres</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="allerAnnonces()"
+      >
+        📢
+        <span>Annonces</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="allerMessagerie()"
+      >
+        💬
+        <span>Messages</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="allerProfil()"
+      >
+        👤
+        <span>Profil</span>
+      </button>
+
+      <button
+        type="button"
+        class="active"
+      >
+        ⚙️
+        <span>Administration</span>
+      </button>
+
+    </nav>
+
+  </aside>
 
 
-  <!-- CONTENU -->
+  <!-- ZONE PRINCIPALE -->
+  <div class="main-area">
 
-  <main class="content">
+    <!-- TOPBAR -->
+    <header class="topbar">
 
+      <span class="topbar-label">
+        ESPACE ADMINISTRATEUR
+      </span>
 
-    <!-- EN-TÊTE -->
-
-    <section class="page-header">
-
-      <div>
-
-        <span class="page-label">
-          ESPACE ADMINISTRATEUR
-        </span>
-
-        <h1>
-          Gestion des membres
-        </h1>
-
-        <p>
-          Ajoutez, modifiez ou supprimez les membres
-          de PrivateClub.
-        </p>
-
+      <div class="topbar-user">
+        ⚙️
       </div>
 
+    </header>
 
+
+    <!-- CONTENU -->
+    <main class="content">
+
+      <!-- RETOUR -->
       <button
-        class="add-button"
-        (click)="ouvrirAjout()">
-
-        + Ajouter un membre
-
+        type="button"
+        class="back-button"
+        (click)="retourDashboard()"
+      >
+        ← Retour au Dashboard
       </button>
 
-    </section>
+
+      <!-- EN-TÊTE -->
+      <section class="page-header">
+
+        <div>
+
+          <span class="page-label">
+            PRIVATECLUB
+          </span>
+
+          <h1>
+            Administration
+          </h1>
+
+          <p>
+            Gérez les membres et les accès de votre entreprise.
+          </p>
+
+        </div>
 
 
-    <!-- RECHERCHE -->
+        <button
+          type="button"
+          class="add-button"
+          (click)="ouvrirAjout()"
+        >
+          + Ajouter un membre
+        </button>
 
-    <div class="search-box">
-
-      <span>
-        🔎
-      </span>
-
-      <input
-        type="text"
-        placeholder="Rechercher un membre..."
-        [(ngModel)]="recherche"
-      >
-
-    </div>
+      </section>
 
 
-    <!-- FORMULAIRE -->
+      <!-- STATISTIQUES -->
+      <section class="stats-grid">
 
-    @if (formulaireVisible) {
+        <div class="stat-card">
 
-      <section class="form-card">
-
-
-        <div class="form-header">
+          <div class="stat-icon">
+            👥
+          </div>
 
           <div>
 
             <span>
-              {{ modeModification
-                ? 'MODIFICATION'
-                : 'NOUVEAU MEMBRE' }}
+              Membres
             </span>
 
-            <h2>
-
-              {{ modeModification
-                ? 'Modifier le membre'
-                : 'Ajouter un membre' }}
-
-            </h2>
+            <strong>
+              {{ membres.length }}
+            </strong>
 
           </div>
-
-
-          <button
-            class="close-button"
-            (click)="fermerFormulaire()">
-
-            ×
-
-          </button>
 
         </div>
 
 
-        @if (message) {
+        <div class="stat-card">
 
-          <div class="error-message">
-
-            {{ message }}
-
+          <div class="stat-icon">
+            🛡️
           </div>
 
-        }
+          <div>
 
+            <span>
+              Responsables
+            </span>
 
-        <div class="form-grid">
-
-
-          <!-- NOM -->
-
-          <div class="field">
-
-            <label>
-              Nom complet
-            </label>
-
-            <input
-              type="text"
-              placeholder="Ex : Koffi Paul"
-              [(ngModel)]="nouveauNom"
-            >
+            <strong>
+              {{ nombreResponsables }}
+            </strong>
 
           </div>
-
-
-          <!-- RÔLE -->
-
-          <div class="field">
-
-            <label>
-              Rôle
-            </label>
-
-            <select
-              [(ngModel)]="nouveauRole">
-
-              <option value="Membre">
-                Membre
-              </option>
-
-              <option value="Responsable">
-                Responsable
-              </option>
-
-              <option value="Admin">
-                Admin
-              </option>
-
-            </select>
-
-          </div>
-
-
-          <!-- DÉPARTEMENT -->
-
-          <div class="field">
-
-            <label>
-              Département
-            </label>
-
-            <input
-              type="text"
-              placeholder="Ex : Informatique"
-              [(ngModel)]="nouveauDepartement"
-            >
-
-          </div>
-
-
-          <!-- EMAIL -->
-
-          <div class="field">
-
-            <label>
-              Email professionnel
-            </label>
-
-            <input
-              type="email"
-              placeholder="exemple@privateclub.com"
-              [(ngModel)]="nouvelEmail"
-            >
-
-          </div>
-
-
-          <!-- IDENTIFIANT -->
-
-          <div class="field">
-
-            <label>
-              Identifiant de connexion
-            </label>
-
-            <input
-              type="text"
-              placeholder="Ex : paul"
-              [(ngModel)]="nouvelIdentifiant"
-            >
-
-          </div>
-
-
-          <!-- MOT DE PASSE -->
-
-          <div class="field">
-
-            <label>
-              Mot de passe
-
-              @if (modeModification) {
-                <span>
-                  (laisser vide pour conserver l'actuel)
-                </span>
-              }
-
-            </label>
-
-            <div class="password-field">
-
-              <input
-                [type]="afficherMotDePasse ? 'text' : 'password'"
-                placeholder="Ex : 1234"
-                [(ngModel)]="nouveauMotDePasse"
-              >
-
-              <button
-                type="button"
-                class="password-toggle"
-                (click)="basculerMotDePasse()">
-
-                {{ afficherMotDePasse ? '🙈' : '👁️' }}
-
-              </button>
-
-            </div>
-
-          </div>
-
 
         </div>
 
 
-        <!-- BOUTONS -->
+        <div class="stat-card">
 
-        <div class="form-actions">
+          <div class="stat-icon">
+            👤
+          </div>
 
-          <button
-            class="cancel-button"
-            (click)="fermerFormulaire()">
+          <div>
 
-            Annuler
+            <span>
+              Membres simples
+            </span>
 
-          </button>
+            <strong>
+              {{ nombreMembres }}
+            </strong>
+
+          </div>
+
+        </div>
 
 
-          <button
-            class="save-button"
-            (click)="enregistrerMembre()">
+        <div class="stat-card">
 
-            {{ modeModification
-              ? 'Enregistrer les modifications'
-              : 'Ajouter le membre' }}
+          <div class="stat-icon">
+            ⚙️
+          </div>
 
-          </button>
+          <div>
+
+            <span>
+              Administrateurs
+            </span>
+
+            <strong>
+              {{ nombreAdmins }}
+            </strong>
+
+          </div>
 
         </div>
 
       </section>
 
-    }
+
+      <!-- RECHERCHE -->
+      <div class="search-box">
+
+        <span>
+          🔎
+        </span>
+
+        <input
+          type="text"
+          placeholder="Rechercher par nom, rôle, département ou email..."
+          [(ngModel)]="recherche"
+        >
+
+      </div>
 
 
-    <!-- LISTE DES MEMBRES -->
+      <!-- MESSAGE -->
+      @if (message) {
 
-    <section class="members-section">
+        <div class="admin-message">
+          ⚠️ {{ message }}
+        </div>
+
+      }
 
 
-      <div class="section-title">
+      <!-- FORMULAIRE -->
+      @if (formulaireVisible) {
 
-        <div>
+        <section class="form-card">
 
-          <span>
-            MEMBRES DU CLUB
-          </span>
+          <div class="form-header">
 
-          <h2>
+            <div>
+
+              <span class="form-label">
+                {{ modeModification ? 'MODIFICATION' : 'NOUVEAU MEMBRE' }}
+              </span>
+
+              <h2>
+                {{ modeModification
+                  ? 'Modifier le membre'
+                  : 'Ajouter un membre' }}
+              </h2>
+
+            </div>
+
+
+            <button
+              type="button"
+              class="close-button"
+              (click)="fermerFormulaire()"
+            >
+              ×
+            </button>
+
+          </div>
+
+
+          <div class="form-grid">
+
+
+            <!-- NOM -->
+            <div class="field">
+
+              <label>
+                Nom complet
+              </label>
+
+              <input
+                type="text"
+                placeholder="Ex : Koffi Paul"
+                [(ngModel)]="nouveauNom"
+              >
+
+            </div>
+
+
+            <!-- ROLE -->
+            <div class="field">
+
+              <label>
+                Rôle
+              </label>
+
+              <select
+                [(ngModel)]="nouveauRole"
+              >
+
+                <option value="Membre">
+                  Membre
+                </option>
+
+                <option value="Responsable">
+                  Responsable
+                </option>
+
+                <option value="Admin">
+                  Admin
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <!-- DEPARTEMENT -->
+            <div class="field">
+
+              <label>
+                Département
+              </label>
+
+              <input
+                type="text"
+                placeholder="Ex : Informatique"
+                [(ngModel)]="nouveauDepartement"
+              >
+
+            </div>
+
+
+            <!-- EMAIL -->
+            <div class="field">
+
+              <label>
+                Email professionnel
+              </label>
+
+              <input
+                type="email"
+                placeholder="exemple@privateclub.com"
+                [(ngModel)]="nouvelEmail"
+              >
+
+            </div>
+
+
+            <!-- IDENTIFIANT -->
+            <div class="field">
+
+              <label>
+                Identifiant de connexion
+              </label>
+
+              <input
+                type="text"
+                placeholder="Ex : paul"
+                [(ngModel)]="nouvelIdentifiant"
+              >
+
+            </div>
+
+
+            <!-- MOT DE PASSE -->
+            <div class="field">
+
+              <label>
+
+                Mot de passe
+
+                @if (modeModification) {
+
+                  <small>
+                    Laisser vide pour conserver l'actuel
+                  </small>
+
+                }
+
+              </label>
+
+
+              <div class="password-field">
+
+                <input
+                  [type]="afficherMotDePasse ? 'text' : 'password'"
+                  placeholder="Mot de passe"
+                  [(ngModel)]="nouveauMotDePasse"
+                >
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  (click)="basculerMotDePasse()"
+                >
+                  {{ afficherMotDePasse ? '🙈' : '👁️' }}
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ACTIONS -->
+          <div class="form-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              (click)="fermerFormulaire()"
+            >
+              Annuler
+            </button>
+
+
+            <button
+              type="button"
+              class="save-button"
+              (click)="enregistrerMembre()"
+            >
+              {{ modeModification
+                ? 'Enregistrer les modifications'
+                : 'Ajouter le membre' }}
+            </button>
+
+          </div>
+
+        </section>
+
+      }
+
+
+      <!-- LISTE DES MEMBRES -->
+      <section class="members-section">
+
+        <div class="section-title">
+
+          <div>
+
+            <span class="section-label">
+              UTILISATEURS
+            </span>
+
+            <h2>
+              Membres de PrivateClub
+            </h2>
+
+          </div>
+
+          <span class="member-count">
             {{ membresFiltres.length }} membre(s)
-          </h2>
+          </span>
 
         </div>
 
-      </div>
+
+        <div class="members-list">
+
+          @for (
+            membre of membresFiltres;
+            track membre.id
+          ) {
+
+            <article class="member-card">
 
 
-      <div class="members-list">
+              <!-- AVATAR -->
+              <div class="avatar">
+
+                {{ membre.nom.charAt(0).toUpperCase() }}
+
+              </div>
 
 
-        @for (
-          membre of membresFiltres;
-          track membre.id
-        ) {
+              <!-- INFORMATIONS -->
+              <div class="member-info">
+
+                <h3>
+                  {{ membre.nom }}
+                </h3>
+
+                <span
+                  class="role"
+                  [class.admin]="membre.role === 'Admin'"
+                  [class.responsable]="membre.role === 'Responsable'"
+                >
+                  {{ membre.role }}
+                </span>
+
+                <p>
+                  🏢
+                  {{ membre.departement || 'Département non renseigné' }}
+                </p>
+
+                <p>
+                  ✉️
+                  {{ membre.email }}
+                </p>
+
+              </div>
 
 
-          <div class="member-card">
-
-
-            <!-- AVATAR -->
-
-            <div class="avatar">
-
-              {{ membre.nom.charAt(0) }}
-
-            </div>
-
-
-            <!-- INFORMATIONS -->
-
-            <div class="member-info">
-
-              <h3>
-                {{ membre.nom }}
-              </h3>
-
-
-              <span class="role">
-
-                {{ membre.role }}
-
-              </span>
-
-
-              <p>
-
-                🏢 {{ membre.departement }}
-
-              </p>
-
-
-              <p>
-
-                ✉️ {{ membre.email }}
-
-              </p>
-
-            </div>
-
-
-            <!-- ACTIONS -->
-
-            <div class="member-actions">
-
-
-              <button
-                class="edit-button"
-                (click)="ouvrirModification(membre)">
-
-                ✏️ Modifier
-
-              </button>
-
-
-              @if (membre.role !== 'Admin') {
+              <!-- ACTIONS -->
+              <div class="member-actions">
 
                 <button
-                  class="delete-button"
-                  (click)="supprimerMembre(membre)">
-
-                  🗑️ Supprimer
-
+                  type="button"
+                  class="edit-button"
+                  (click)="ouvrirModification(membre)"
+                >
+                  ✏️ Modifier
                 </button>
 
-              }
 
+                @if (membre.role !== 'Admin') {
+
+                  <button
+                    type="button"
+                    class="delete-button"
+                    (click)="supprimerMembre(membre)"
+                  >
+                    🗑️ Supprimer
+                  </button>
+
+                }
+
+              </div>
+
+            </article>
+
+          }
+
+
+          <!-- AUCUN RESULTAT -->
+          @if (membresFiltres.length === 0) {
+
+            <div class="no-result">
+
+              <div class="no-result-icon">
+                🔎
+              </div>
+
+              <h2>
+                Aucun membre trouvé
+              </h2>
+
+              <p>
+                Essayez avec un autre nom, rôle ou département.
+              </p>
 
             </div>
 
+          }
 
-          </div>
+        </div>
 
-        }
+      </section>
 
+    </main>
 
-        <!-- AUCUN RÉSULTAT -->
-
-        @if (membresFiltres.length === 0) {
-
-          <div class="no-result">
-
-            <div>
-              🔎
-            </div>
-
-            <h2>
-              Aucun membre trouvé
-            </h2>
-
-            <p>
-              Essayez avec un autre nom.
-            </p>
-
-          </div>
-
-        }
-
-
-      </div>
-
-    </section>
-
-
-  </main>
+  </div>
 
 </div>
-

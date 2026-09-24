@@ -1,3 +1,4 @@
+
 import {
   Component,
   OnInit,
@@ -20,11 +21,20 @@ import { ApiService } from '../../services/api';
 
 @Component({
   selector: 'app-messagerie',
-  imports: [FormsModule, DatePipe],
+
+  imports: [
+    FormsModule,
+    DatePipe
+  ],
+
   templateUrl: './messagerie.html',
+
   styleUrl: './messagerie.css'
 })
+
+
 export class Messagerie implements OnInit {
+
 
   membreSelectionne = '';
 
@@ -45,6 +55,11 @@ export class Messagerie implements OnInit {
   messages: any[] = [];
 
   messageErreur = '';
+
+
+  fichierSelectionne: File | null = null;
+
+  nomFichier = '';
 
 
   constructor(
@@ -68,43 +83,27 @@ export class Messagerie implements OnInit {
       this.auth.getId();
 
 
-    console.log(
-      'ID UTILISATEUR CONNECTÉ :',
-      this.idUtilisateur
-    );
+    this.route.queryParams.subscribe(params => {
 
+      const id = Number(params['id']);
 
-    // ===============================
-    // LIRE L'ID DU MEMBRE DANS L'URL
-    // ===============================
+      if (id) {
 
-    this.route.queryParams.subscribe(
-      params => {
-
-        const id =
-          Number(params['id']);
-
-        if (id) {
-
-          this.idMembreSelectionne =
-            id;
-
-        }
-
-        this.chargerMessages();
+        this.idMembreSelectionne = id;
 
       }
-    );
+
+      this.mettreAJourMembreSelectionne();
+
+      this.chargerMessages();
+
+    });
 
 
     this.chargerMembres();
 
   }
 
-
-  // ===============================
-  // CHARGER LES MEMBRES
-  // ===============================
 
   chargerMembres() {
 
@@ -114,8 +113,7 @@ export class Messagerie implements OnInit {
 
         next: (resultats: any) => {
 
-          this.membres =
-            resultats;
+          this.membres = resultats;
 
           this.mettreAJourMembreSelectionne();
 
@@ -123,7 +121,7 @@ export class Messagerie implements OnInit {
 
 
           if (
-            this.idMembreSelectionne
+            this.idMembreSelectionne !== null
           ) {
 
             this.chargerMessages();
@@ -149,14 +147,10 @@ export class Messagerie implements OnInit {
   }
 
 
-  // ===============================
-  // METTRE À JOUR LE MEMBRE SÉLECTIONNÉ
-  // ===============================
-
   mettreAJourMembreSelectionne() {
 
     if (
-      !this.idMembreSelectionne
+      this.idMembreSelectionne === null
     ) {
 
       return;
@@ -168,7 +162,7 @@ export class Messagerie implements OnInit {
       this.membres.find(
         m =>
           Number(m.id) ===
-          this.idMembreSelectionne
+          Number(this.idMembreSelectionne)
       );
 
 
@@ -182,9 +176,16 @@ export class Messagerie implements OnInit {
   }
 
 
-  // ===============================
-  // FILTRER LES MEMBRES
-  // ===============================
+  getMembreSelectionne() {
+
+    return this.membres.find(
+      membre =>
+        Number(membre.id) ===
+        Number(this.idMembreSelectionne)
+    );
+
+  }
+
 
   get membresFiltres() {
 
@@ -205,23 +206,19 @@ export class Messagerie implements OnInit {
       membre =>
 
         membre.nom
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(texte)
 
         ||
 
         membre.role
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(texte)
 
     );
 
   }
 
-
-  // ===============================
-  // SÉLECTIONNER UN MEMBRE
-  // ===============================
 
   selectionnerMembre(
     id: number
@@ -242,27 +239,6 @@ export class Messagerie implements OnInit {
     }
 
 
-    console.log(
-      'MEMBRE CLIQUÉ :',
-      membre.nom
-    );
-
-
-    if (
-      !this.peutContacter(
-        membre.id
-      )
-    ) {
-
-      console.log(
-        'CONTACT NON AUTORISÉ'
-      );
-
-      return;
-
-    }
-
-
     this.idMembreSelectionne =
       Number(membre.id);
 
@@ -275,7 +251,11 @@ export class Messagerie implements OnInit {
     this.messageErreur =
       '';
 
-    this.messages = [];
+    this.messages =
+      [];
+
+
+    this.retirerFichier();
 
 
     this.router.navigate(
@@ -290,15 +270,87 @@ export class Messagerie implements OnInit {
 
     this.chargerMessages();
 
-    this.cdr.detectChanges();
+  }
+
+
+  /**
+   * Détermine si un membre doit apparaître
+   * dans la liste des conversations.
+   *
+   * Un Membre peut voir les Admins,
+   * mais ne peut pas leur répondre.
+   */
+  peutAfficherMembre(
+    membre: any
+  ): boolean {
+
+    if (!membre) {
+
+      return false;
+
+    }
+
+
+    if (
+      Number(membre.id) ===
+      Number(this.idUtilisateur)
+    ) {
+
+      return false;
+
+    }
+
+
+    // Admin peut voir tout le monde
+    if (
+      this.roleUtilisateur ===
+      'Admin'
+    ) {
+
+      return true;
+
+    }
+
+
+    // Responsable peut voir Admins + Membres
+    if (
+      this.roleUtilisateur ===
+      'Responsable'
+    ) {
+
+      return (
+        membre.role === 'Admin' ||
+        membre.role === 'Membre'
+      );
+
+    }
+
+
+    // Membre peut VOIR les Admins,
+    // mais ne pourra pas leur répondre.
+    if (
+      this.roleUtilisateur ===
+      'Membre'
+    ) {
+
+      return (
+        membre.role === 'Admin' ||
+        membre.role === 'Responsable' ||
+        membre.role === 'Membre'
+      );
+
+    }
+
+
+    return false;
 
   }
 
 
-  // ===============================
-  // VÉRIFIER LES DROITS
-  // ===============================
-
+  /**
+   * Détermine si l'utilisateur a le droit
+   * d'envoyer un message à ce membre.
+   */
   peutContacter(
     id: number
   ): boolean {
@@ -318,7 +370,6 @@ export class Messagerie implements OnInit {
     }
 
 
-    // Impossible de se contacter soi-même
     if (
       Number(membre.id) ===
       Number(this.idUtilisateur)
@@ -329,12 +380,10 @@ export class Messagerie implements OnInit {
     }
 
 
-    // ===============================
-    // ADMIN
-    // ===============================
-
+    // Admin → tout le monde
     if (
-      this.roleUtilisateur === 'Admin'
+      this.roleUtilisateur ===
+      'Admin'
     ) {
 
       return true;
@@ -342,12 +391,10 @@ export class Messagerie implements OnInit {
     }
 
 
-    // ===============================
-    // RESPONSABLE
-    // ===============================
-
+    // Responsable → Admin + Membres
     if (
-      this.roleUtilisateur === 'Responsable'
+      this.roleUtilisateur ===
+      'Responsable'
     ) {
 
       return (
@@ -358,12 +405,11 @@ export class Messagerie implements OnInit {
     }
 
 
-    // ===============================
-    // MEMBRE
-    // ===============================
-
+    // Membre → Responsable + Membres
+    // PAS Admin
     if (
-      this.roleUtilisateur === 'Membre'
+      this.roleUtilisateur ===
+      'Membre'
     ) {
 
       return (
@@ -379,14 +425,10 @@ export class Messagerie implements OnInit {
   }
 
 
-  // ===============================
-  // CHARGER LES MESSAGES
-  // ===============================
-
   chargerMessages() {
 
     if (
-      !this.idMembreSelectionne ||
+      this.idMembreSelectionne === null ||
       !this.idUtilisateur
     ) {
 
@@ -410,18 +452,8 @@ export class Messagerie implements OnInit {
     }
 
 
-    console.log(
-      'CHARGEMENT CONVERSATION AVEC :',
-      membre.nom,
-      'ID :',
-      membre.id
-    );
-
-
-    // ===============================
-    // MARQUER LES MESSAGES COMME LUS
-    // ===============================
-
+    // On marque uniquement les messages reçus
+    // comme lus.
     this.api
       .marquerMessagesLus(
         membre.id
@@ -431,7 +463,7 @@ export class Messagerie implements OnInit {
         next: (resultat: any) => {
 
           console.log(
-            'MESSAGES MARQUÉS COMME LUS :',
+            'MESSAGES LUS :',
             resultat.nombre
           );
 
@@ -440,7 +472,7 @@ export class Messagerie implements OnInit {
         error: (erreur: any) => {
 
           console.error(
-            'ERREUR MARQUAGE MESSAGES :',
+            'ERREUR MARQUAGE :',
             erreur
           );
 
@@ -448,10 +480,6 @@ export class Messagerie implements OnInit {
 
       });
 
-
-    // ===============================
-    // CHARGER LA CONVERSATION
-    // ===============================
 
     this.api
       .getMessages(
@@ -486,15 +514,17 @@ export class Messagerie implements OnInit {
   }
 
 
-  // ===============================
-  // ENVOYER UN MESSAGE
-  // ===============================
+  selectionnerFichier(
+    event: Event
+  ) {
 
-  envoyerMessage() {
+    const input =
+      event.target as HTMLInputElement;
+
 
     if (
-      !this.idMembreSelectionne ||
-      this.nouveauMessage.trim() === ''
+      !input.files ||
+      input.files.length === 0
     ) {
 
       return;
@@ -502,11 +532,199 @@ export class Messagerie implements OnInit {
     }
 
 
+    const fichier =
+      input.files[0];
+
+
+    const tailleMax =
+      10 * 1024 * 1024;
+
+
+    if (
+      fichier.size >
+      tailleMax
+    ) {
+
+      this.messageErreur =
+        'Le fichier ne doit pas dépasser 10 Mo.';
+
+      this.fichierSelectionne =
+        null;
+
+      this.nomFichier =
+        '';
+
+      input.value =
+        '';
+
+      return;
+
+    }
+
+
+    const extensionsAutorisees = [
+      'jpg',
+      'jpeg',
+      'png',
+      'webp',
+      'pdf',
+      'doc',
+      'docx',
+      'xls',
+      'xlsx',
+      'ppt',
+      'pptx',
+      'txt'
+    ];
+
+
+    const nom =
+      fichier.name.toLowerCase();
+
+
+    const extension =
+      nom.split('.').pop();
+
+
+    if (
+      !extension ||
+      !extensionsAutorisees.includes(
+        extension
+      )
+    ) {
+
+      this.messageErreur =
+        'Ce type de fichier n’est pas autorisé.';
+
+      this.fichierSelectionne =
+        null;
+
+      this.nomFichier =
+        '';
+
+      input.value =
+        '';
+
+      return;
+
+    }
+
+
+    this.fichierSelectionne =
+      fichier;
+
+    this.nomFichier =
+      fichier.name;
+
+    this.messageErreur =
+      '';
+
+
+    this.cdr.detectChanges();
+
+  }
+
+
+  retirerFichier() {
+
+    this.fichierSelectionne =
+      null;
+
+    this.nomFichier =
+      '';
+
+
+    const input =
+      document.getElementById(
+        'fichierMessage'
+      ) as HTMLInputElement;
+
+
+    if (input) {
+
+      input.value =
+        '';
+
+    }
+
+
+    this.cdr.detectChanges();
+
+  }
+
+
+  obtenirUrlFichier(
+    fichier: string
+  ): string {
+
+    return (
+      'http://localhost:3000' +
+      fichier
+    );
+
+  }
+
+
+  ouvrirFichier(
+    fichier: string
+  ) {
+
+    if (!fichier) {
+
+      return;
+
+    }
+
+
+    const url =
+      this.obtenirUrlFichier(
+        fichier
+      );
+
+
+    window.open(
+      url,
+      '_blank'
+    );
+
+  }
+
+
+  envoyerMessage() {
+
+    if (
+      this.idMembreSelectionne === null
+    ) {
+
+      return;
+
+    }
+
+
+    const contenu =
+      this.nouveauMessage.trim();
+
+
+    if (
+      contenu === '' &&
+      !this.fichierSelectionne
+    ) {
+
+      return;
+
+    }
+
+
+    // Sécurité : un Membre ne peut pas
+    // répondre à un Admin.
     if (
       !this.peutContacter(
         this.idMembreSelectionne
       )
     ) {
+
+      this.messageErreur =
+        "Vous n'êtes pas autorisé à contacter ce membre.";
 
       return;
 
@@ -529,24 +747,39 @@ export class Messagerie implements OnInit {
 
 
     this.api
-      .envoyerMessage(
+      .envoyerMessageAvecFichier(
         this.idUtilisateur,
         membre.id,
-        this.nouveauMessage.trim()
+        contenu,
+        this.fichierSelectionne
       )
       .subscribe({
 
         next: () => {
 
+          console.log(
+            'MESSAGE ENVOYÉ'
+          );
+
+
           this.nouveauMessage =
             '';
+
+
+          this.retirerFichier();
+
 
           this.messageErreur =
             '';
 
+
           this.chargerMessages();
 
+
+          this.cdr.detectChanges();
+
         },
+
 
         error: (erreur: any) => {
 
@@ -555,8 +788,52 @@ export class Messagerie implements OnInit {
             erreur
           );
 
-          this.messageErreur =
-            "Erreur lors de l'envoi du message.";
+
+          if (
+            erreur?.error?.message
+          ) {
+
+            this.messageErreur =
+              erreur.error.message;
+
+          }
+
+          else if (
+            erreur?.status === 413
+          ) {
+
+            this.messageErreur =
+              'Le fichier est trop volumineux.';
+
+          }
+
+          else if (
+            erreur?.status === 403
+          ) {
+
+            this.messageErreur =
+              "Vous n'êtes pas autorisé à contacter ce membre.";
+
+          }
+
+          else if (
+            erreur?.status === 401
+          ) {
+
+            this.messageErreur =
+              'Votre session a expiré. Veuillez vous reconnecter.';
+
+          }
+
+          else {
+
+            this.messageErreur =
+              "Erreur lors de l'envoi du message.";
+
+          }
+
+
+          this.cdr.detectChanges();
 
         }
 
@@ -565,16 +842,69 @@ export class Messagerie implements OnInit {
   }
 
 
-  // ===============================
-  // RETOUR DASHBOARD
-  // ===============================
+  deconnexion() {
+
+    this.auth.deconnecter();
+
+    this.router.navigate([
+      '/'
+    ]);
+
+  }
+
 
   retourDashboard() {
 
-    this.router.navigate(
-      ['/dashboard']
-    );
+    this.router.navigate([
+      '/dashboard'
+    ]);
+
+  }
+
+
+  allerAccueil() {
+
+    this.router.navigate([
+      '/dashboard'
+    ]);
+
+  }
+
+
+  allerMembres() {
+
+    this.router.navigate([
+      '/membres'
+    ]);
+
+  }
+
+
+  allerAnnonces() {
+
+    this.router.navigate([
+      '/annonces'
+    ]);
+
+  }
+
+
+  allerProfil() {
+
+    this.router.navigate([
+      '/profil'
+    ]);
+
+  }
+
+
+  allerAdministration() {
+
+    this.router.navigate([
+      '/administration'
+    ]);
 
   }
 
 }
+

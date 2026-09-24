@@ -1,16 +1,30 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef
+} from '@angular/core';
+
 import { Router } from '@angular/router';
+
 import { FormsModule } from '@angular/forms';
+
 import { Auth } from '../../services/auth';
+
 import { ApiService } from '../../services/api';
+
 
 @Component({
   selector: 'app-membres',
-  imports: [FormsModule],
+
+  imports: [
+    FormsModule
+  ],
+
   templateUrl: './membres.html',
+
   styleUrl: './membres.css'
 })
-export class Membres {
+export class Membres implements OnInit {
 
   membres: any[] = [];
 
@@ -18,73 +32,50 @@ export class Membres {
 
   roleUtilisateur = '';
 
-  nomUtilisateur = '';
-
   idUtilisateur: any = null;
+
+  messageErreur = '';
 
 
   constructor(
     private router: Router,
+
     private auth: Auth,
+
     private api: ApiService,
+
     private cdr: ChangeDetectorRef
   ) {}
 
 
-  ngOnInit() {
+  // =====================================================
+  // INITIALISATION
+  // =====================================================
 
-    console.log(
-      'PAGE MEMBRES CHARGÉE'
-    );
+  ngOnInit() {
 
     this.roleUtilisateur =
       this.auth.getRole();
 
-    this.nomUtilisateur =
-      this.auth.getNom();
-
     this.idUtilisateur =
       this.auth.getId();
-
-
-    console.log(
-      'ROLE :',
-      this.roleUtilisateur
-    );
-
-    console.log(
-      'NOM :',
-      this.nomUtilisateur
-    );
-
-    console.log(
-      'ID :',
-      this.idUtilisateur
-    );
-
 
     this.chargerMembres();
 
   }
 
 
+  // =====================================================
+  // CHARGER LES MEMBRES
+  // =====================================================
+
   chargerMembres() {
-
-    console.log(
-      'CHARGEMENT DES MEMBRES...'
-    );
-
 
     this.api
       .getUtilisateurs()
       .subscribe({
 
         next: (resultats: any) => {
-
-          console.log(
-            'MEMBRES REÇUS DE MYSQL :',
-            resultats
-          );
 
           this.membres =
             resultats;
@@ -93,13 +84,15 @@ export class Membres {
 
         },
 
-
-        error: (erreur) => {
+        error: (erreur: any) => {
 
           console.error(
-            'ERREUR API MEMBRES :',
+            'ERREUR MEMBRES :',
             erreur
           );
+
+          this.messageErreur =
+            'Impossible de charger les membres.';
 
         }
 
@@ -107,6 +100,10 @@ export class Membres {
 
   }
 
+
+  // =====================================================
+  // FILTRER LES MEMBRES
+  // =====================================================
 
   get membresFiltres() {
 
@@ -127,19 +124,19 @@ export class Membres {
       membre =>
 
         membre.nom
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(texte)
 
         ||
 
         membre.role
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(texte)
 
         ||
 
-        (membre.departement || '')
-          .toLowerCase()
+        membre.departement
+          ?.toLowerCase()
           .includes(texte)
 
     );
@@ -147,13 +144,27 @@ export class Membres {
   }
 
 
+  // =====================================================
+  // VÉRIFIER SI ON PEUT CONTACTER UN MEMBRE
+  // =====================================================
+
   peutEnvoyerMessage(
     membre: any
   ): boolean {
 
-    // Ne pas envoyer de message à soi-même
+    if (!membre) {
+
+      return false;
+
+    }
+
+
+    // Impossible de s'envoyer
+    // un message à soi-même
+
     if (
-      membre.id == this.idUtilisateur
+      Number(membre.id) ===
+      Number(this.idUtilisateur)
     ) {
 
       return false;
@@ -161,7 +172,8 @@ export class Membres {
     }
 
 
-    // Admin → tout le monde
+    // ADMIN
+
     if (
       this.roleUtilisateur === 'Admin'
     ) {
@@ -171,7 +183,8 @@ export class Membres {
     }
 
 
-    // Responsable → Admin + Membres
+    // RESPONSABLE
+
     if (
       this.roleUtilisateur === 'Responsable'
     ) {
@@ -184,7 +197,8 @@ export class Membres {
     }
 
 
-    // Membre → Responsable + autres Membres
+    // MEMBRE
+
     if (
       this.roleUtilisateur === 'Membre'
     ) {
@@ -202,38 +216,59 @@ export class Membres {
   }
 
 
-  // ===============================
-  // VÉRIFIER SI C'EST MON PROFIL
-  // ===============================
+  // =====================================================
+  // VÉRIFIER MON PROFIL
+  // =====================================================
 
   estMonProfil(
     membre: any
   ): boolean {
 
-    return membre.id == this.idUtilisateur;
+    return (
+      Number(membre.id) ===
+      Number(this.idUtilisateur)
+    );
 
   }
 
 
-  // ===============================
+  // =====================================================
   // OUVRIR LA MESSAGERIE
-  // ===============================
+  // =====================================================
 
   ouvrirMessagerie(
-    id: number
+    nom: string
   ) {
+
+    const membre =
+      this.membres.find(
+        m =>
+          m.nom === nom
+      );
+
+
+    if (!membre) {
+
+      return;
+
+    }
+
 
     this.router.navigate(
       ['/messagerie'],
       {
         queryParams: {
-          id: id
+          id: membre.id
         }
       }
     );
 
   }
 
+
+  // =====================================================
+  // RETOUR DASHBOARD
+  // =====================================================
 
   retourDashboard() {
 
@@ -242,5 +277,25 @@ export class Membres {
     );
 
   }
+
+  allerAccueil() {
+  this.router.navigate(['/dashboard']);
+}
+
+allerAnnonces() {
+  this.router.navigate(['/annonces']);
+}
+
+allerMessagerie() {
+  this.router.navigate(['/messagerie']);
+}
+
+allerProfil() {
+  this.router.navigate(['/profil']);
+}
+
+allerAdministration() {
+  this.router.navigate(['/administration']);
+}
 
 }

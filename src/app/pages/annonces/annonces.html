@@ -1,206 +1,499 @@
+
 <div class="annonces-page">
 
-  <header class="topbar">
+  <aside class="sidebar">
 
-    <img
-      src="/logo.png"
-      alt="PrivateClub"
-      class="logo"
-    >
+    <div class="sidebar-logo">
+      <img
+        src="/logo.png"
+        alt="PrivateClub"
+      >
+    </div>
 
-    <button
-      class="back-button"
-      (click)="retourDashboard()"
-    >
-      Retour au Dashboard
-    </button>
+    <nav class="sidebar-nav">
 
-  </header>
+      <button
+        type="button"
+        (click)="allerAccueil()"
+      >
+        🏠 Accueil
+      </button>
+
+      <button
+        type="button"
+        (click)="allerMembres()"
+      >
+        👥 Membres
+      </button>
+
+      <button
+        type="button"
+        class="active"
+      >
+        📢 Annonces
+      </button>
+
+      <button
+        type="button"
+        (click)="allerMessagerie()"
+      >
+        💬 Messages
+      </button>
+
+      <button
+        type="button"
+        (click)="allerProfil()"
+      >
+        👤 Profil
+      </button>
+
+      @if (roleUtilisateur === 'Admin') {
+
+        <button
+          type="button"
+          (click)="allerAdministration()"
+        >
+          ⚙️ Administration
+        </button>
+
+      }
+
+    </nav>
+
+  </aside>
 
 
-  <main class="content">
+  <div class="main-area">
 
-    <h1>
-      Les annonces
-    </h1>
+    <header class="topbar">
 
-    <p>
-      Découvrez les annonces publiées sur PrivateClub.
-    </p>
+      <span class="topbar-label">
+        ESPACE PRIVÉ
+      </span>
 
-
-    <!-- MESSAGE -->
-
-    @if (message !== '') {
-
-      <div class="message">
-        {{ message }}
+      <div class="topbar-user">
+        👤
       </div>
 
-    }
+    </header>
 
 
-    <!-- PUBLICATION ADMIN -->
+    <main class="content">
 
-    @if (roleUtilisateur === 'Admin') {
+      <button
+        type="button"
+        class="back-button"
+        (click)="retourDashboard()"
+      >
+        ← Retour au Dashboard
+      </button>
 
-      <div class="publication-box">
 
-        <div class="publication-icon">
-          📢
-        </div>
+      <div class="page-header">
 
-        <div class="publication-info">
+        <div>
 
-          <h2>
-            Publier une annonce
-          </h2>
+          <span class="page-label">
+            PRIVATECLUB
+          </span>
+
+          <h1>
+            Centre des annonces
+          </h1>
 
           <p>
-            Partagez une information avec les membres du club.
+            Retrouvez ici les informations importantes
+            de votre entreprise.
           </p>
 
         </div>
 
-        <button
-          class="publish-button"
-          (click)="ouvrirFormulaire()"
-        >
-          + Nouvelle annonce
-        </button>
+
+        <div class="announcement-count">
+
+          <strong>
+            {{ annonces.length }}
+          </strong>
+
+          <span>
+            annonce(s)
+          </span>
+
+        </div>
 
       </div>
 
-    }
+
+      @if (message !== '') {
+
+        <div class="message">
+          {{ message }}
+        </div>
+
+      }
 
 
-    <!-- FORMULAIRE -->
+      @if (roleUtilisateur === 'Admin') {
 
-    @if (formulaireVisible) {
+        <div class="publication-box">
 
-      <div class="publication-form">
+          <div class="publication-icon">
+            📢
+          </div>
 
-        <div class="form-header">
+          <div class="publication-info">
 
-          <div>
-
-            <span class="form-label">
-              NOUVELLE PUBLICATION
+            <span class="publication-label">
+              ADMINISTRATION
             </span>
 
             <h2>
               Publier une annonce
             </h2>
 
+            <p>
+              Partagez rapidement une information
+              avec les membres du club.
+            </p>
+
           </div>
 
-          <span class="form-icon">
-            ✦
-          </span>
-
-        </div>
-
-
-        <input
-          type="text"
-          placeholder="Titre de l'annonce"
-          [(ngModel)]="nouveauTitre"
-        >
-
-
-        <textarea
-          placeholder="Écrivez le contenu de votre annonce..."
-          [(ngModel)]="nouveauContenu"
-        ></textarea>
-
-
-        <div class="form-actions">
-
           <button
-            class="cancel-button"
-            (click)="formulaireVisible = false"
+            type="button"
+            class="publish-button"
+            (click)="ouvrirFormulaire()"
           >
-            Annuler
-          </button>
-
-
-          <button
-            class="submit-button"
-            (click)="publierAnnonce()"
-          >
-            Publier l'annonce →
+            + Nouvelle annonce
           </button>
 
         </div>
 
-      </div>
-
-    }
+      }
 
 
-    <!-- LISTE DES ANNONCES -->
+      @if (formulaireVisible) {
 
-    @for (
-      annonce of annonces;
-      track annonce.id
-    ) {
+        <div class="publication-form">
 
-      <div class="annonce-card">
+          <div class="form-header">
 
-        <h2>
-          {{ annonce.titre }}
-        </h2>
+            <div>
+
+              <span class="form-label">
+                NOUVELLE PUBLICATION
+              </span>
+
+              <h2>
+                Publier une annonce
+              </h2>
+
+            </div>
+
+            <span class="form-icon">
+              📢
+            </span>
+
+          </div>
 
 
-        <p>
-          {{ annonce.contenu }}
-        </p>
-
-
-        <span>
-          Publié par {{ annonce.auteur }}
-          —
-          {{ annonce.date_creation | date:'dd MMMM yyyy' }}
-        </span>
-
-
-        <!-- SUPPRESSION ADMIN -->
-
-        @if (roleUtilisateur === 'Admin') {
-
-          <button
-            class="delete-button"
-            (click)="supprimerAnnonce(annonce.id)"
+          <input
+            type="text"
+            placeholder="Titre de l'annonce"
+            [(ngModel)]="nouveauTitre"
           >
-            🗑️ Supprimer
-          </button>
+
+
+          <textarea
+            placeholder="Écrivez le contenu de votre annonce..."
+            [(ngModel)]="nouveauContenu"
+          ></textarea>
+
+
+          <div class="file-upload">
+
+            <input
+              #fichierInput
+              type="file"
+              hidden
+              (change)="selectionnerFichier($event)"
+              accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+            >
+
+            <button
+              type="button"
+              class="file-button"
+              (click)="fichierInput.click()"
+            >
+              📎 Ajouter un fichier
+            </button>
+
+
+            @if (nomFichier) {
+
+              <div class="file-selected">
+
+                <span class="file-icon">
+                  📄
+                </span>
+
+                <span class="file-name">
+                  {{ nomFichier }}
+                </span>
+
+                <button
+                  type="button"
+                  class="remove-file"
+                  (click)="retirerFichier()"
+                  title="Retirer le fichier"
+                >
+                  ×
+                </button>
+
+              </div>
+
+            }
+
+
+            <small>
+              JPG, PNG, WEBP, PDF, Word, Excel,
+              PowerPoint ou TXT — 10 Mo maximum.
+            </small>
+
+          </div>
+
+
+          <div class="form-actions">
+
+            <button
+              type="button"
+              class="cancel-button"
+              (click)="fermerFormulaire()"
+            >
+              Annuler
+            </button>
+
+            <button
+              type="button"
+              class="submit-button"
+              (click)="publierAnnonce()"
+            >
+              Publier l'annonce →
+            </button>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      @if (annonces.length > 0) {
+
+        <div class="section-title">
+
+          <div>
+
+            <span>
+              INFORMATIONS
+            </span>
+
+            <h2>
+              Dernières annonces
+            </h2>
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <section class="annonces-list">
+
+
+        @for (
+          annonce of annonces;
+          track annonce.id
+        ) {
+
+          <article class="annonce-card">
+
+
+            <div class="annonce-top">
+
+              <span class="annonce-category">
+                📢 INFORMATION
+              </span>
+
+
+              @if (roleUtilisateur === 'Admin') {
+
+                <button
+                  type="button"
+                  class="delete-button"
+                  (click)="supprimerAnnonce(annonce.id, $event)"
+                  title="Supprimer l'annonce"
+                >
+                  🗑️
+                </button>
+
+              }
+
+            </div>
+
+
+            <div class="annonce-main">
+
+              <div class="annonce-text">
+
+                <h2>
+                  {{ annonce.titre }}
+                </h2>
+
+                <p class="annonce-content">
+                  {{ annonce.contenu }}
+                </p>
+
+              </div>
+
+
+              @if (annonce.fichier) {
+
+                <div class="attachment-box">
+
+
+                  <div class="attachment-preview">
+
+
+                    @if (estImage(annonce)) {
+
+                      <img
+                        [src]="obtenirUrlFichier(annonce.fichier)"
+                        [alt]="annonce.nom_fichier || 'Image'"
+                      >
+
+                    }
+
+
+                    @else if (estPdf(annonce)) {
+
+                      <iframe
+                        [src]="obtenirUrlPdf(annonce.fichier)"
+                        title="Aperçu PDF"
+                      ></iframe>
+
+                    }
+
+
+                    @else {
+
+                      <div class="file-preview">
+
+                        <span class="file-preview-icon">
+                          📎
+                        </span>
+
+                        <strong>
+                          FICHIER
+                        </strong>
+
+                        <span>
+                          {{ obtenirExtension(annonce.nom_fichier) }}
+                        </span>
+
+                      </div>
+
+                    }
+
+                  </div>
+
+
+                  <div class="attachment-info">
+
+                    <strong>
+                      {{ annonce.nom_fichier || 'Fichier joint' }}
+                    </strong>
+
+                    <span>
+                      {{ annonce.type_fichier || 'Pièce jointe' }}
+                    </span>
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    class="attachment-button"
+                    (click)="ouvrirFichier(annonce.fichier)"
+                  >
+                    Ouvrir →
+                  </button>
+
+
+                </div>
+
+              }
+
+            </div>
+
+
+            <div class="annonce-footer">
+
+              <span>
+                👤 {{ annonce.auteur || 'Administration' }}
+              </span>
+
+              <span>
+                📅
+                {{ annonce.date_creation | date:'dd MMMM yyyy' }}
+              </span>
+
+            </div>
+
+
+          </article>
 
         }
 
-      </div>
 
-    }
+        @if (annonces.length === 0) {
 
+          <div class="no-annonces">
 
-    <!-- AUCUNE ANNONCE -->
+            <div class="empty-icon">
+              📢
+            </div>
 
-    @if (annonces.length === 0) {
+            <h2>
+              Aucune annonce
+            </h2>
 
-      <div class="no-annonces">
-
-        <h2>
-          Aucune annonce
-        </h2>
-
-        <p>
-          Aucune annonce n'a encore été publiée.
-        </p>
-
-      </div>
-
-    }
+            <p>
+              Aucune annonce n'a encore été publiée.
+            </p>
 
 
-  </main>
+            @if (roleUtilisateur === 'Admin') {
+
+              <button
+                type="button"
+                class="empty-button"
+                (click)="ouvrirFormulaire()"
+              >
+                + Publier la première annonce
+              </button>
+
+            }
+
+          </div>
+
+        }
+
+      </section>
+
+    </main>
+
+  </div>
 
 </div>
+

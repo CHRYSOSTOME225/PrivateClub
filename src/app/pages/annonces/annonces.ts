@@ -1,17 +1,49 @@
 
-import { Component, ChangeDetectorRef } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Auth } from '../../services/auth';
-import { ApiService } from '../../services/api';
+import {
+  Component,
+  ChangeDetectorRef
+} from '@angular/core';
+
+import {
+  DatePipe
+} from '@angular/common';
+
+import {
+  FormsModule
+} from '@angular/forms';
+
+import {
+  Router
+} from '@angular/router';
+
+import {
+  DomSanitizer,
+  SafeResourceUrl
+} from '@angular/platform-browser';
+
+import {
+  Auth
+} from '../../services/auth';
+
+import {
+  ApiService
+} from '../../services/api';
+
 
 @Component({
   selector: 'app-annonces',
-  imports: [FormsModule, DatePipe],
+
+  imports: [
+    FormsModule,
+    DatePipe
+  ],
+
   templateUrl: './annonces.html',
+
   styleUrl: './annonces.css'
 })
+
+
 export class Annonces {
 
   roleUtilisateur = '';
@@ -21,16 +53,26 @@ export class Annonces {
   formulaireVisible = false;
 
   nouveauTitre = '';
+
   nouveauContenu = '';
 
   message = '';
 
+  fichierSelectionne: File | null = null;
+
+  nomFichier = '';
+
 
   constructor(
     private router: Router,
+
     public auth: Auth,
+
     private api: ApiService,
-    private cdr: ChangeDetectorRef
+
+    private cdr: ChangeDetectorRef,
+
+    private sanitizer: DomSanitizer
   ) {}
 
 
@@ -43,10 +85,6 @@ export class Annonces {
 
   }
 
-
-  // ===============================
-  // CHARGER LES ANNONCES
-  // ===============================
 
   chargerAnnonces() {
 
@@ -80,15 +118,15 @@ export class Annonces {
   }
 
 
-  // ===============================
-  // OUVRIR LE FORMULAIRE
-  // ===============================
-
   ouvrirFormulaire() {
 
     this.nouveauTitre = '';
 
     this.nouveauContenu = '';
+
+    this.fichierSelectionne = null;
+
+    this.nomFichier = '';
 
     this.message = '';
 
@@ -98,9 +136,150 @@ export class Annonces {
   }
 
 
-  // ===============================
-  // PUBLIER UNE ANNONCE
-  // ===============================
+  fermerFormulaire() {
+
+    this.formulaireVisible =
+      false;
+
+    this.nouveauTitre = '';
+
+    this.nouveauContenu = '';
+
+    this.fichierSelectionne = null;
+
+    this.nomFichier = '';
+
+    this.message = '';
+
+  }
+
+
+  selectionnerFichier(
+    evenement: Event
+  ) {
+
+    const input =
+      evenement.target as HTMLInputElement;
+
+
+    if (
+      !input.files ||
+      input.files.length === 0
+    ) {
+
+      this.fichierSelectionne =
+        null;
+
+      this.nomFichier =
+        '';
+
+      return;
+
+    }
+
+
+    const fichier =
+      input.files[0];
+
+
+    const tailleMax =
+      10 * 1024 * 1024;
+
+
+    const extensionsAutorisees = [
+
+      'jpg',
+      'jpeg',
+      'png',
+      'webp',
+
+      'pdf',
+
+      'doc',
+      'docx',
+
+      'xls',
+      'xlsx',
+
+      'ppt',
+      'pptx',
+
+      'txt'
+
+    ];
+
+
+    const extension =
+      fichier.name
+        .split('.')
+        .pop()
+        ?.toLowerCase();
+
+
+    if (
+      !extension ||
+      !extensionsAutorisees.includes(
+        extension
+      )
+    ) {
+
+      this.message =
+        'Type de fichier non autorisé.';
+
+      input.value = '';
+
+      this.fichierSelectionne =
+        null;
+
+      this.nomFichier =
+        '';
+
+      return;
+
+    }
+
+
+    if (
+      fichier.size > tailleMax
+    ) {
+
+      this.message =
+        'Le fichier ne doit pas dépasser 10 Mo.';
+
+      input.value = '';
+
+      this.fichierSelectionne =
+        null;
+
+      this.nomFichier =
+        '';
+
+      return;
+
+    }
+
+
+    this.fichierSelectionne =
+      fichier;
+
+    this.nomFichier =
+      fichier.name;
+
+    this.message = '';
+
+  }
+
+
+  retirerFichier() {
+
+    this.fichierSelectionne =
+      null;
+
+    this.nomFichier =
+      '';
+
+  }
+
 
   publierAnnonce() {
 
@@ -117,24 +296,36 @@ export class Annonces {
     }
 
 
-    // L'ID de l'auteur n'est plus
-    // envoyé depuis le frontend.
-    // Le backend récupère automatiquement
-    // l'Admin connecté grâce au JWT.
+    const formulaire =
+      new FormData();
 
-    const donnees = {
 
-      titre:
-        this.nouveauTitre.trim(),
+    formulaire.append(
+      'titre',
+      this.nouveauTitre.trim()
+    );
 
-      contenu:
-        this.nouveauContenu.trim()
 
-    };
+    formulaire.append(
+      'contenu',
+      this.nouveauContenu.trim()
+    );
+
+
+    if (
+      this.fichierSelectionne
+    ) {
+
+      formulaire.append(
+        'fichier',
+        this.fichierSelectionne
+      );
+
+    }
 
 
     this.api
-      .creerAnnonce(donnees)
+      .creerAnnonce(formulaire)
       .subscribe({
 
         next: () => {
@@ -143,10 +334,17 @@ export class Annonces {
 
           this.nouveauContenu = '';
 
+          this.fichierSelectionne =
+            null;
+
+          this.nomFichier =
+            '';
+
           this.formulaireVisible =
             false;
 
-          this.message = '';
+          this.message =
+            '';
 
           this.chargerAnnonces();
 
@@ -178,9 +376,19 @@ export class Annonces {
 
           }
 
+          else if (
+            erreur.status === 413
+          ) {
+
+            this.message =
+              'Le fichier est trop volumineux.';
+
+          }
+
           else {
 
             this.message =
+              erreur?.error?.message ||
               'Erreur lors de la publication.';
 
           }
@@ -192,13 +400,135 @@ export class Annonces {
   }
 
 
-  // ===============================
-  // SUPPRIMER UNE ANNONCE
-  // ===============================
+  estImage(
+    annonce: any
+  ): boolean {
+
+    if (
+      annonce?.type_fichier
+    ) {
+
+      return annonce.type_fichier
+        .toLowerCase()
+        .startsWith('image/');
+
+    }
+
+
+    const nom =
+      annonce?.nom_fichier ||
+      annonce?.fichier ||
+      '';
+
+
+    return /\.(jpg|jpeg|png|webp)$/i
+      .test(nom);
+
+  }
+
+
+  estPdf(
+    annonce: any
+  ): boolean {
+
+    if (
+      annonce?.type_fichier
+        ?.toLowerCase() ===
+      'application/pdf'
+    ) {
+
+      return true;
+
+    }
+
+
+    const nom =
+      annonce?.nom_fichier ||
+      annonce?.fichier ||
+      '';
+
+
+    return /\.pdf$/i.test(nom);
+
+  }
+
+
+  obtenirUrlFichier(
+    fichier: string
+  ): string {
+
+    return 'http://localhost:3000' + fichier;
+
+  }
+
+
+  obtenirUrlPdf(
+    fichier: string
+  ): SafeResourceUrl {
+
+    return this.sanitizer
+      .bypassSecurityTrustResourceUrl(
+        this.obtenirUrlFichier(fichier)
+      );
+
+  }
+
+
+  obtenirExtension(
+    nom: string
+  ): string {
+
+    if (!nom) {
+
+      return 'FICHIER';
+
+    }
+
+
+    const morceaux =
+      nom.split('.');
+
+
+    if (
+      morceaux.length < 2
+    ) {
+
+      return 'FICHIER';
+
+    }
+
+
+    return morceaux
+      .pop()
+      ?.toUpperCase() ||
+      'FICHIER';
+
+  }
+
+
+  ouvrirFichier(
+    fichier: string
+  ) {
+
+    window.open(
+      this.obtenirUrlFichier(fichier),
+      '_blank'
+    );
+
+  }
+
 
   supprimerAnnonce(
-    id: number
+    id: number,
+    evenement?: Event
   ) {
+
+    if (evenement) {
+
+      evenement.stopPropagation();
+
+    }
+
 
     const confirmation =
       confirm(
@@ -256,15 +586,56 @@ export class Annonces {
   }
 
 
-  // ===============================
-  // RETOUR DASHBOARD
-  // ===============================
-
   retourDashboard() {
 
-    this.router.navigate(
-      ['/dashboard']
-    );
+    this.router.navigate([
+      '/dashboard'
+    ]);
+
+  }
+
+
+  allerAccueil() {
+
+    this.router.navigate([
+      '/dashboard'
+    ]);
+
+  }
+
+
+  allerMembres() {
+
+    this.router.navigate([
+      '/membres'
+    ]);
+
+  }
+
+
+  allerMessagerie() {
+
+    this.router.navigate([
+      '/messagerie'
+    ]);
+
+  }
+
+
+  allerProfil() {
+
+    this.router.navigate([
+      '/profil'
+    ]);
+
+  }
+
+
+  allerAdministration() {
+
+    this.router.navigate([
+      '/administration'
+    ]);
 
   }
 

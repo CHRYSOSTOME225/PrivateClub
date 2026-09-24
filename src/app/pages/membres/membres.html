@@ -1,161 +1,322 @@
 <div class="membres-page">
 
-  <header class="topbar">
+  <!-- SIDEBAR -->
 
-    <img
-      src="/logo.png"
-      alt="PrivateClub"
-      class="logo"
-    >
+  <aside class="sidebar">
 
-    <button
-      class="back-button"
-      (click)="retourDashboard()"
-    >
-      Retour au Dashboard
-    </button>
+    <div class="sidebar-logo">
 
-  </header>
-
-
-  <main class="content">
-
-    <div class="page-header">
-
-      <div>
-
-        <span class="page-label">
-          PRIVATECLUB
-        </span>
-
-        <h1>
-          Les membres
-        </h1>
-
-        <p>
-          Découvrez les membres de votre club.
-        </p>
-
-      </div>
-
-
-      <div class="member-count">
-
-        <strong>
-          {{ membresFiltres.length }}
-        </strong>
-
-        <span>
-          membre(s)
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div class="search-box">
-
-      <span class="search-icon">
-        🔎
-      </span>
-
-      <input
-        type="text"
-        placeholder="Rechercher un membre, un rôle ou un département..."
-        [(ngModel)]="recherche"
+      <img
+        src="/logo.png"
+        alt="PrivateClub"
       >
 
     </div>
 
 
-    <section class="members-list">
+    <nav class="sidebar-nav">
 
-      @for (
-        membre of membresFiltres;
-        track membre.id
-      ) {
-
-        <div class="member-card">
-
-          <div class="avatar">
-
-            {{ membre.nom.charAt(0) }}
-
-          </div>
+      <button
+        type="button"
+        class="nav-item"
+        (click)="allerAccueil()"
+      >
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
 
 
-          <div class="member-info">
-
-            <h2>
-              {{ membre.nom }}
-            </h2>
-
-            <span class="role">
-              {{ membre.role }}
-            </span>
-
-            <p>
-              🏢 {{ membre.departement || 'Non renseigné' }}
-            </p>
-
-            <p>
-              ✉️ {{ membre.email }}
-            </p>
-
-          </div>
+      <button
+        type="button"
+        class="nav-item active"
+      >
+        <span>👥</span>
+        <span>Membres</span>
+      </button>
 
 
-          <div class="member-action">
+      <button
+        type="button"
+        class="nav-item"
+        (click)="allerAnnonces()"
+      >
+        <span>📢</span>
+        <span>Annonces</span>
+      </button>
 
-            @if (peutEnvoyerMessage(membre)) {
 
-              <button
-                class="message-button"
-                (click)="ouvrirMessagerie(membre.nom)"
-              >
-                💬 Message
-              </button>
+      <button
+        type="button"
+        class="nav-item"
+        (click)="allerMessagerie()"
+      >
+        <span>💬</span>
+        <span>Messages</span>
+      </button>
 
-            }
 
-            @else if (estMonProfil(membre)) {
+      <button
+        type="button"
+        class="nav-item"
+        (click)="allerProfil()"
+      >
+        <span>👤</span>
+        <span>Profil</span>
+      </button>
 
-              <span class="current-user">
-                Vous
-              </span>
 
-            }
+      @if (roleUtilisateur === 'Admin') {
 
-          </div>
-
-        </div>
+        <button
+          type="button"
+          class="nav-item"
+          (click)="allerAdministration()"
+        >
+          <span>⚙️</span>
+          <span>Administration</span>
+        </button>
 
       }
 
+    </nav>
 
-      @if (membresFiltres.length === 0) {
+  </aside>
 
-        <div class="no-result">
 
-          <div>
-            🔎
-          </div>
+  <!-- ZONE PRINCIPALE -->
 
-          <h2>
-            Aucun membre trouvé
-          </h2>
+  <div class="main-area">
+
+
+    <!-- TOPBAR -->
+
+    <header class="topbar">
+
+      <span class="topbar-label">
+        ESPACE PRIVÉ
+      </span>
+
+
+      <div class="topbar-user">
+
+        👤
+
+      </div>
+
+    </header>
+
+
+    <!-- CONTENU -->
+
+    <main class="content">
+
+
+      <!-- RETOUR -->
+
+      <button
+        type="button"
+        class="back-button"
+        (click)="retourDashboard()"
+      >
+        ← Retour au Dashboard
+      </button>
+
+
+      <!-- TITRE -->
+
+      <div class="page-header">
+
+        <div>
+
+          <span class="page-label">
+            PRIVATECLUB
+          </span>
+
+          <h1>
+            Les membres
+          </h1>
 
           <p>
-            Essayez avec un autre nom, rôle ou département.
+            Annuaire des membres de PrivateClub.
           </p>
 
         </div>
 
+
+        <div class="member-count">
+
+          <strong>
+            {{ membresFiltres.length }}
+          </strong>
+
+          <span>
+            membre(s)
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- MESSAGE ERREUR -->
+
+      @if (messageErreur !== '') {
+
+        <div class="error-message">
+
+          ⚠️ {{ messageErreur }}
+
+        </div>
+
       }
 
-    </section>
 
-  </main>
+      <!-- RECHERCHE -->
+
+      <div class="search-box">
+
+        <span class="search-icon">
+          🔎
+        </span>
+
+        <input
+          type="text"
+          placeholder="Rechercher un membre, un rôle ou un département..."
+          [(ngModel)]="recherche"
+        >
+
+      </div>
+
+
+      <!-- LISTE DES MEMBRES -->
+
+      <section class="members-list">
+
+
+        @for (
+          membre of membresFiltres;
+          track membre.id
+        ) {
+
+          <div class="member-card">
+
+
+            <!-- AVATAR -->
+
+            <div class="avatar">
+
+              @if (membre.photo) {
+
+                <img
+                  [src]="'http://localhost:3000' + membre.photo"
+                  [alt]="'Photo de ' + membre.nom"
+                >
+
+              } @else {
+
+                <span>
+                  {{ membre.nom.charAt(0).toUpperCase() }}
+                </span>
+
+              }
+
+            </div>
+
+
+            <!-- INFORMATIONS -->
+
+            <div class="member-info">
+
+              <h2>
+                {{ membre.nom }}
+              </h2>
+
+
+              <span class="role">
+                {{ membre.role }}
+              </span>
+
+
+              <p>
+                🏢
+                {{ membre.departement || 'Non renseigné' }}
+              </p>
+
+
+              <p>
+                ✉️
+                {{ membre.email }}
+              </p>
+
+            </div>
+
+
+            <!-- ACTION -->
+
+            <div class="member-action">
+
+
+              @if (
+                peutEnvoyerMessage(membre)
+              ) {
+
+                <button
+                  type="button"
+                  class="message-button"
+                  (click)="ouvrirMessagerie(membre.nom)"
+                >
+                  💬 Message
+                </button>
+
+              }
+
+
+              @else if (
+                estMonProfil(membre)
+              ) {
+
+                <span class="current-user">
+                  Vous
+                </span>
+
+              }
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- AUCUN RÉSULTAT -->
+
+        @if (
+          membresFiltres.length === 0
+        ) {
+
+          <div class="no-result">
+
+            <div>
+              🔎
+            </div>
+
+            <h2>
+              Aucun membre trouvé
+            </h2>
+
+            <p>
+              Essayez avec un autre nom,
+              rôle ou département.
+            </p>
+
+          </div>
+
+        }
+
+      </section>
+
+    </main>
+
+  </div>
 
 </div>

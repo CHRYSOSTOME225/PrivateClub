@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const utilisateursRoutes = require("./routes/utilisateurs");
 const connexionRoutes = require("./routes/connexion");
@@ -13,6 +14,14 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
+// Fichiers statiques
+app.use(
+    "/uploads",
+    express.static(
+        path.join(__dirname, "uploads")
+    )
+);
+
 // Routes
 app.use("/api/utilisateurs", utilisateursRoutes);
 app.use("/api/connexion", connexionRoutes);
@@ -25,16 +34,19 @@ app.get("/", (req, res) => {
         message: "Bienvenue sur l'API PrivateClub"
     });
 });
- 
+
 const verifierToken = require("./middleware/auth");
 
-app.get("/api/test-protection", verifierToken, (req, res) => {
-    res.json({
-        message: "Token valide",
-        utilisateur: req.utilisateur
-    });
-});
-
+app.get(
+    "/api/test-protection",
+    verifierToken,
+    (req, res) => {
+        res.json({
+            message: "Token valide",
+            utilisateur: req.utilisateur
+        });
+    }
+);
 
 // Démarrage du serveur
 app.listen(PORT, () => {

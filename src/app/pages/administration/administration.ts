@@ -1,4 +1,3 @@
-
 import {
   Component,
   ChangeDetectorRef
@@ -63,15 +62,49 @@ export class Administration {
       this.auth.getRole() !== 'Admin'
     ) {
 
-      this.router.navigate(
-        ['/dashboard']
-      );
+      this.router.navigate([
+        '/dashboard'
+      ]);
 
       return;
 
     }
 
     this.chargerMembres();
+
+  }
+
+
+  // ==============================
+  // STATISTIQUES
+  // ==============================
+
+  get nombreResponsables() {
+
+    return this.membres.filter(
+      membre =>
+        membre.role === 'Responsable'
+    ).length;
+
+  }
+
+
+  get nombreMembres() {
+
+    return this.membres.filter(
+      membre =>
+        membre.role === 'Membre'
+    ).length;
+
+  }
+
+
+  get nombreAdmins() {
+
+    return this.membres.filter(
+      membre =>
+        membre.role === 'Admin'
+    ).length;
 
   }
 
@@ -106,6 +139,7 @@ export class Administration {
             'ERREUR CHARGEMENT MEMBRES :',
             erreur
           );
+
 
           if (
             erreur.status === 401
@@ -151,7 +185,9 @@ export class Administration {
         .trim();
 
 
-    if (texte === '') {
+    if (
+      texte === ''
+    ) {
 
       return this.membres;
 
@@ -161,13 +197,13 @@ export class Administration {
     return this.membres.filter(
       membre =>
 
-        membre.nom
+        (membre.nom || '')
           .toLowerCase()
           .includes(texte)
 
         ||
 
-        membre.role
+        (membre.role || '')
           .toLowerCase()
           .includes(texte)
 
@@ -179,7 +215,7 @@ export class Administration {
 
         ||
 
-        membre.email
+        (membre.email || '')
           .toLowerCase()
           .includes(texte)
 
@@ -259,8 +295,6 @@ export class Administration {
     this.nouvelIdentifiant =
       membre.email;
 
-    // Le mot de passe est vide
-    // par défaut lors d'une modification.
     this.nouveauMotDePasse =
       '';
 
@@ -294,7 +328,6 @@ export class Administration {
 
   enregistrerMembre() {
 
-    // Champs obligatoires communs
     if (
       this.nouveauNom.trim() === '' ||
       this.nouveauDepartement.trim() === '' ||
@@ -491,7 +524,7 @@ export class Administration {
             else {
 
               this.message =
-                'Erreur lors de la création du membre.';
+                'Erreur lors de la création.';
 
             }
 
@@ -531,7 +564,9 @@ export class Administration {
       );
 
 
-    if (!confirmation) {
+    if (
+      !confirmation
+    ) {
 
       return;
 
@@ -594,7 +629,7 @@ export class Administration {
 
 
   // ==============================
-  // FERMER
+  // FERMER LE FORMULAIRE
   // ==============================
 
   fermerFormulaire() {
@@ -609,14 +644,63 @@ export class Administration {
 
 
   // ==============================
+  // NAVIGATION SIDEBAR
+  // ==============================
+
+  allerAccueil() {
+
+    this.router.navigate([
+      '/dashboard'
+    ]);
+
+  }
+
+
+  allerMembres() {
+
+    this.router.navigate([
+      '/membres'
+    ]);
+
+  }
+
+
+  allerAnnonces() {
+
+    this.router.navigate([
+      '/annonces'
+    ]);
+
+  }
+
+
+  allerMessagerie() {
+
+    this.router.navigate([
+      '/messagerie'
+    ]);
+
+  }
+
+
+  allerProfil() {
+
+    this.router.navigate([
+      '/profil'
+    ]);
+
+  }
+
+
+  // ==============================
   // RETOUR DASHBOARD
   // ==============================
 
   retourDashboard() {
 
-    this.router.navigate(
-      ['/dashboard']
-    );
+    this.router.navigate([
+      '/dashboard'
+    ]);
 
   }
 

@@ -1,5 +1,3 @@
-
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
@@ -8,18 +6,10 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ApiService {
 
-  private apiUrl =
-    'http://localhost:3000/api';
+  private apiUrl = 'http://localhost:3000/api';
 
+  constructor(private http: HttpClient) {}
 
-  constructor(
-    private http: HttpClient
-  ) {}
-
-
-  // ===============================
-  // CONNEXION
-  // ===============================
 
   connexion(
     email: string,
@@ -37,10 +27,6 @@ export class ApiService {
   }
 
 
-  // ===============================
-  // UTILISATEURS
-  // ===============================
-
   getUtilisateurs() {
 
     return this.http.get(
@@ -50,13 +36,7 @@ export class ApiService {
   }
 
 
-  // ===============================
-  // UTILISATEUR PAR ID
-  // ===============================
-
-  getUtilisateur(
-    id: number
-  ) {
+  getUtilisateur(id: number) {
 
     return this.http.get(
       `${this.apiUrl}/utilisateurs/${id}`
@@ -65,13 +45,7 @@ export class ApiService {
   }
 
 
-  // ===============================
-  // CRÉER UN UTILISATEUR
-  // ===============================
-
-  creerUtilisateur(
-    donnees: any
-  ) {
+  creerUtilisateur(donnees: any) {
 
     return this.http.post(
       `${this.apiUrl}/utilisateurs`,
@@ -80,10 +54,6 @@ export class ApiService {
 
   }
 
-
-  // ===============================
-  // MODIFIER UN UTILISATEUR
-  // ===============================
 
   modifierUtilisateur(
     id: number,
@@ -98,13 +68,7 @@ export class ApiService {
   }
 
 
-  // ===============================
-  // SUPPRIMER UN UTILISATEUR
-  // ===============================
-
-  supprimerUtilisateur(
-    id: number
-  ) {
+  supprimerUtilisateur(id: number) {
 
     return this.http.delete(
       `${this.apiUrl}/utilisateurs/${id}`
@@ -112,10 +76,6 @@ export class ApiService {
 
   }
 
-
-  // ===============================
-  // ANNONCES
-  // ===============================
 
   getAnnonces() {
 
@@ -126,32 +86,17 @@ export class ApiService {
   }
 
 
-  // ===============================
-  // CRÉER UNE ANNONCE
-  // ===============================
-
-  creerAnnonce(
-    donnees: {
-      titre: string;
-      contenu: string;
-    }
-  ) {
+  creerAnnonce(formulaire: FormData) {
 
     return this.http.post(
       `${this.apiUrl}/annonces`,
-      donnees
+      formulaire
     );
 
   }
 
 
-  // ===============================
-  // SUPPRIMER UNE ANNONCE
-  // ===============================
-
-  supprimerAnnonce(
-    id: number
-  ) {
+  supprimerAnnonce(id: number) {
 
     return this.http.delete(
       `${this.apiUrl}/annonces/${id}`
@@ -160,9 +105,9 @@ export class ApiService {
   }
 
 
-  // ===============================
-  // MESSAGES
-  // ===============================
+  // =====================================================
+  // MESSAGERIE
+  // =====================================================
 
   getMessages(
     utilisateur1: number,
@@ -178,24 +123,24 @@ export class ApiService {
 
   getNombreMessages() {
 
-  return this.http.get(
-    `${this.apiUrl}/messages/compteur`
-  );
+    return this.http.get(
+      `${this.apiUrl}/messages/compteur`
+    );
 
-}
+  }
 
-marquerMessagesLus(
-  utilisateurId: number
-) {
-  return this.http.put(
-    `${this.apiUrl}/messages/lu/${utilisateurId}`,
-    {}
-  );
-}
 
-  // ===============================
-  // ENVOYER UN MESSAGE
-  // ===============================
+  marquerMessagesLus(
+    utilisateurId: number
+  ) {
+
+    return this.http.put(
+      `${this.apiUrl}/messages/lu/${utilisateurId}`,
+      {}
+    );
+
+  }
+
 
   envoyerMessage(
     expediteur_id: number,
@@ -214,5 +159,78 @@ marquerMessagesLus(
 
   }
 
-}
 
+  envoyerMessageAvecFichier(
+    expediteur_id: number,
+    destinataire_id: number,
+    contenu: string,
+    fichier: File | null
+  ) {
+
+    const formulaire =
+      new FormData();
+
+
+    formulaire.append(
+      'expediteur_id',
+      String(expediteur_id)
+    );
+
+
+    formulaire.append(
+      'destinataire_id',
+      String(destinataire_id)
+    );
+
+
+    formulaire.append(
+      'contenu',
+      contenu
+    );
+
+
+    if (fichier) {
+
+      formulaire.append(
+        'fichier',
+        fichier
+      );
+
+    }
+
+
+    return this.http.post(
+      `${this.apiUrl}/messages`,
+      formulaire
+    );
+
+  }
+
+
+  // =====================================================
+  // PHOTO PROFIL
+  // =====================================================
+
+  uploadPhotoProfil(
+    id: number,
+    fichier: File
+  ) {
+
+    const formulaire =
+      new FormData();
+
+
+    formulaire.append(
+      'photo',
+      fichier
+    );
+
+
+    return this.http.post(
+      `${this.apiUrl}/utilisateurs/${id}/photo`,
+      formulaire
+    );
+
+  }
+
+}

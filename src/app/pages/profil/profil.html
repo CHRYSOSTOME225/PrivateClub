@@ -1,146 +1,534 @@
 <div class="profil-page">
 
-  <header class="topbar">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
 
-    <img src="/logo.png" alt="PrivateClub" class="logo">
+    <div class="sidebar-logo">
+      <img src="/logo.png" alt="PrivateClub">
+    </div>
 
-    <button class="back-button" (click)="retourDashboard()">
-      Retour au Dashboard
-    </button>
+    <nav class="sidebar-nav">
 
-  </header>
-
-  <main class="content">
-
-    <h1>Mon profil professionnel</h1>
-
-    <div class="profil-card">
-
-      <div class="avatar">
-        👤
-      </div>
-
-      <button class="edit-button" (click)="modifierProfil()">
-        Modifier
+      <button
+        type="button"
+        (click)="allerAccueil()"
+      >
+        🏠
+        <span>Accueil</span>
       </button>
 
-      <div class="profil-info">
+      <button
+        type="button"
+        (click)="allerMembres()"
+      >
+        👥
+        <span>Membres</span>
+      </button>
 
-        <label for="nom">Nom complet</label>
-        <input
-  id="nom"
-  type="text"
-  [(ngModel)]="nom"
-  [disabled]="!modeModification"
->
+      <button
+        type="button"
+        (click)="allerAnnonces()"
+      >
+        📢
+        <span>Annonces</span>
+      </button>
 
-        <label for="email">E-mail professionnel</label>
-        <input
-  id="email"
-  type="email"
-  [(ngModel)]="email"
-  [disabled]="!modeModification"
->
+      <button
+        type="button"
+        (click)="allerMessagerie()"
+      >
+        💬
+        <span>Messages</span>
+      </button>
 
-        <label for="telephone">Téléphone</label>
-        <input
-  id="telephone"
-  type="tel"
-  placeholder="Votre numéro"
-  [(ngModel)]="telephone"
-  [disabled]="!modeModification"
->
+      <button
+        type="button"
+        class="active"
+      >
+        👤
+        <span>Profil</span>
+      </button>
 
-        <label for="poste">Poste occupé</label>
-        <input
-  id="poste"
-  type="text"
-  placeholder="Ex : Développeur"
-  [(ngModel)]="poste"
-  [disabled]="!modeModification"
->
-
-        <label for="departement">Département</label>
-        <input
-  id="departement"
-  type="text"
-  placeholder="Ex : Informatique"
-  [(ngModel)]="departement"
-  [disabled]="!modeModification"
->
-
-        <label for="matricule">Matricule professionnel</label>
-        <input
-  id="matricule"
-  type="text"
-  placeholder="Votre matricule"
-  [(ngModel)]="matricule"
-  [disabled]="!modeModification"
->
-
-        <button class="save-button" (click)="enregistrerProfil()">
-          Enregistrer
-        </button>
+      @if (roleUtilisateur === 'Admin') {
 
         <button
-          class="password-button"
-          (click)="modifierMotDePasse()"
+          type="button"
+          (click)="allerAdministration()"
         >
-          Modifier le mot de passe
+          ⚙️
+          <span>Administration</span>
         </button>
 
-        @if (modeMotDePasse) {
+      }
 
-          <div class="password-form">
+    </nav>
 
-            <label for="ancienMotDePasse">
-              Ancien mot de passe
-            </label>
+  </aside>
 
-            <input
-              id="ancienMotDePasse"
-              type="password"
-            >
 
-            <label for="nouveauMotDePasse">
-              Nouveau mot de passe
-            </label>
+  <!-- ZONE PRINCIPALE -->
+  <div class="main-area">
 
-            <input
-  id="nouveauMotDePasse"
-  type="password"
-  #nouveauMotDePasse
->
+    <!-- TOPBAR -->
+    <header class="topbar">
 
-            <label for="confirmationMotDePasse">
-              Confirmer le nouveau mot de passe
-            </label>
+      <div>
 
-            <input
-  id="confirmationMotDePasse"
-  type="password"
-  #confirmation
->
+        <span class="topbar-label">
+          ESPACE PRIVÉ
+        </span>
 
-            <button
-  class="save-password-button"
-  (click)="enregistrerMotDePasse(nouveauMotDePasse.value, confirmation.value)"
->
-  Enregistrer le mot de passe
-</button>
+      </div>
 
-<p class="password-message">
-  {{ motDePasseMessage }}
-</p>
+      <div class="topbar-user">
 
-          </div>
+        @if (photo) {
+
+          <img
+            [src]="'http://localhost:3000' + photo"
+            alt="Photo"
+          >
+
+        } @else {
+
+          👤
 
         }
 
       </div>
 
-    </div>
+    </header>
 
-  </main>
+
+    <!-- CONTENU -->
+    <main class="content">
+
+      <!-- RETOUR -->
+      <button
+        type="button"
+        class="back-button"
+        (click)="retourDashboard()"
+      >
+        ← Retour au Dashboard
+      </button>
+
+
+      <!-- TITRE -->
+      <div class="page-header">
+
+        <div>
+
+          <span class="page-label">
+            PRIVATECLUB
+          </span>
+
+          <h1>
+            Mon profil
+          </h1>
+
+          <p>
+            Gérez vos informations professionnelles et la sécurité de votre compte.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- PROFIL -->
+      <section class="profil-container">
+
+
+        <!-- CARTE INFORMATIONS -->
+        <div class="profil-card">
+
+
+          <!-- EN-TÊTE PROFIL -->
+          <div class="profil-header">
+
+
+            <!-- PHOTO -->
+            <div class="profile-photo-container">
+
+              <div class="avatar">
+
+                @if (photo) {
+
+                  <img
+                    [src]="'http://localhost:3000' + photo"
+                    alt="Photo de profil"
+                  >
+
+                } @else {
+
+                  <span>
+                    {{ nom ? nom.charAt(0).toUpperCase() : '👤' }}
+                  </span>
+
+                }
+
+              </div>
+
+
+              <!-- ACTION PHOTO -->
+              <div class="photo-actions">
+
+                <label
+                  for="photoProfil"
+                  class="photo-button"
+                >
+                  📷 Choisir une photo
+                </label>
+
+                <input
+                  id="photoProfil"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  (change)="selectionnerPhoto($event)"
+                  hidden
+                >
+
+
+                @if (fichierPhoto) {
+
+                  <button
+                    type="button"
+                    class="upload-photo-button"
+                    (click)="envoyerPhoto()"
+                  >
+                    💾 Enregistrer la photo
+                  </button>
+
+                }
+
+
+                @if (messagePhoto) {
+
+                  <p class="photo-message">
+                    {{ messagePhoto }}
+                  </p>
+
+                }
+
+              </div>
+
+            </div>
+
+
+            <!-- INFORMATIONS UTILISATEUR -->
+            <div class="profil-title">
+
+              <h2>
+                {{ nom || 'Utilisateur' }}
+              </h2>
+
+              <p>
+                {{ poste || 'Poste non renseigné' }}
+              </p>
+
+            </div>
+
+
+            <!-- MODIFIER PROFIL -->
+            <button
+              type="button"
+              class="edit-button"
+              (click)="modifierProfil()"
+            >
+              ✏️ Modifier
+            </button>
+
+          </div>
+
+
+          <!-- MESSAGE -->
+          @if (message) {
+
+            <div class="message-success">
+              ✓ {{ message }}
+            </div>
+
+          }
+
+
+          <!-- INFORMATIONS -->
+          <div class="profil-section">
+
+
+            <div class="section-title">
+
+              <span class="section-icon">
+                👤
+              </span>
+
+              <div>
+
+                <h3>
+                  Informations personnelles
+                </h3>
+
+                <p>
+                  Vos informations professionnelles
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="profil-grid">
+
+
+              <!-- NOM -->
+              <div class="form-group">
+
+                <label for="nom">
+                  Nom complet
+                </label>
+
+                <input
+                  id="nom"
+                  type="text"
+                  [(ngModel)]="nom"
+                  [disabled]="!modeModification"
+                >
+
+              </div>
+
+
+              <!-- EMAIL -->
+              <div class="form-group">
+
+                <label for="email">
+                  E-mail professionnel
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  [(ngModel)]="email"
+                  [disabled]="!modeModification"
+                >
+
+              </div>
+
+
+              <!-- TELEPHONE -->
+              <div class="form-group">
+
+                <label for="telephone">
+                  Téléphone
+                </label>
+
+                <input
+                  id="telephone"
+                  type="tel"
+                  placeholder="Votre numéro"
+                  [(ngModel)]="telephone"
+                  [disabled]="!modeModification"
+                >
+
+              </div>
+
+
+              <!-- POSTE -->
+              <div class="form-group">
+
+                <label for="poste">
+                  Poste occupé
+                </label>
+
+                <input
+                  id="poste"
+                  type="text"
+                  placeholder="Ex : Développeur"
+                  [(ngModel)]="poste"
+                  [disabled]="!modeModification"
+                >
+
+              </div>
+
+
+              <!-- DEPARTEMENT -->
+              <div class="form-group">
+
+                <label for="departement">
+                  Département
+                </label>
+
+                <input
+                  id="departement"
+                  type="text"
+                  placeholder="Ex : Informatique"
+                  [(ngModel)]="departement"
+                  [disabled]="!modeModification"
+                >
+
+              </div>
+
+
+              <!-- MATRICULE -->
+              <div class="form-group">
+
+                <label for="matricule">
+                  Matricule professionnel
+                </label>
+
+                <input
+                  id="matricule"
+                  type="text"
+                  [(ngModel)]="matricule"
+                  disabled
+                >
+
+              </div>
+
+            </div>
+
+
+            <!-- ENREGISTRER PROFIL -->
+            @if (modeModification) {
+
+              <div class="actions">
+
+                <button
+                  type="button"
+                  class="save-button"
+                  (click)="enregistrerProfil()"
+                >
+                  💾 Enregistrer les modifications
+                </button>
+
+              </div>
+
+            }
+
+          </div>
+
+        </div>
+
+
+        <!-- CARTE SECURITE -->
+        <div class="security-card">
+
+
+          <div class="security-header">
+
+            <div class="security-icon">
+              🔐
+            </div>
+
+            <div>
+
+              <h2>
+                Sécurité du compte
+              </h2>
+
+              <p>
+                Gérez votre mot de passe
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="password-button"
+            (click)="modifierMotDePasse()"
+          >
+            🔑
+            {{ modeMotDePasse ? 'Fermer' : 'Modifier le mot de passe' }}
+          </button>
+
+
+          @if (modeMotDePasse) {
+
+            <div class="password-form">
+
+
+              <!-- ANCIEN MOT DE PASSE -->
+              <div class="form-group">
+
+                <label for="ancienMotDePasse">
+                  Ancien mot de passe
+                </label>
+
+                <input
+                  id="ancienMotDePasse"
+                  type="password"
+                  placeholder="Votre ancien mot de passe"
+                >
+
+              </div>
+
+
+              <!-- NOUVEAU MOT DE PASSE -->
+              <div class="form-group">
+
+                <label for="nouveauMotDePasse">
+                  Nouveau mot de passe
+                </label>
+
+                <input
+                  id="nouveauMotDePasse"
+                  type="password"
+                  placeholder="Nouveau mot de passe"
+                  #nouveauMotDePasse
+                >
+
+              </div>
+
+
+              <!-- CONFIRMATION -->
+              <div class="form-group">
+
+                <label for="confirmationMotDePasse">
+                  Confirmer le nouveau mot de passe
+                </label>
+
+                <input
+                  id="confirmationMotDePasse"
+                  type="password"
+                  placeholder="Confirmer le mot de passe"
+                  #confirmation
+                >
+
+              </div>
+
+
+              <!-- ENREGISTRER MOT DE PASSE -->
+              <button
+                type="button"
+                class="save-password-button"
+                (click)="enregistrerMotDePasse(
+                  nouveauMotDePasse.value,
+                  confirmation.value
+                )"
+              >
+                🔒 Enregistrer le mot de passe
+              </button>
+
+
+              @if (motDePasseMessage) {
+
+                <p class="password-message">
+                  {{ motDePasseMessage }}
+                </p>
+
+              }
+
+            </div>
+
+          }
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
 
 </div>

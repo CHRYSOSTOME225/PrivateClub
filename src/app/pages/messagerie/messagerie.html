@@ -1,270 +1,496 @@
 <div class="messagerie-page">
 
-  <header class="topbar">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
 
-    <img
-      src="/logo.png"
-      alt="PrivateClub"
-      class="logo"
-    >
+    <div class="sidebar-logo">
+      <img src="/logo.png" alt="PrivateClub">
+    </div>
 
-    <button
-      class="back-button"
-      (click)="retourDashboard()">
+    <nav class="navigation">
 
-      Retour au Dashboard
+      <button class="nav-item" (click)="retourDashboard()">
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
 
-    </button>
+      <button class="nav-item" (click)="allerMembres()">
+        <span>👥</span>
+        <span>Membres</span>
+      </button>
 
-  </header>
+      <button class="nav-item" (click)="allerAnnonces()">
+        <span>📢</span>
+        <span>Annonces</span>
+      </button>
+
+      <button class="nav-item active">
+        <span>💬</span>
+        <span>Messages</span>
+      </button>
+
+      <button class="nav-item" (click)="allerProfil()">
+        <span>👤</span>
+        <span>Profil</span>
+      </button>
+
+      @if (roleUtilisateur === 'Admin') {
+
+        <button
+          class="nav-item"
+          (click)="allerAdministration()"
+        >
+          <span>⚙️</span>
+          <span>Administration</span>
+        </button>
+
+      }
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+      <button
+        class="nav-item logout-sidebar"
+        (click)="deconnexion()"
+      >
+        <span>🚪</span>
+        <span>Déconnexion</span>
+      </button>
+
+    </div>
+
+  </aside>
 
 
-  <main class="messagerie-container">
+  <!-- ZONE PRINCIPALE -->
+  <div class="main-area">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+
+      <div class="topbar-title">
+        <span>ESPACE PRIVÉ</span>
+      </div>
+
+      <div class="user-area">
+
+        <div class="notification">
+          🔔
+        </div>
+
+        <div class="user-info">
+
+          <span class="welcome-small">
+            Bienvenue
+          </span>
+
+          <strong>
+            {{ nomUtilisateur }}
+          </strong>
+
+        </div>
+
+        <div class="role-mini">
+          {{ roleUtilisateur }}
+        </div>
+
+        <div class="dashboard-avatar">
+          {{ nomUtilisateur.charAt(0).toUpperCase() }}
+        </div>
+
+      </div>
+
+    </header>
 
 
-    <!-- LISTE DES MEMBRES -->
+    <!-- CONTENU -->
+    <main class="main-content">
 
-    <aside class="members-panel">
-
-      <div class="panel-header">
+      <div class="page-header">
 
         <span class="page-label">
-          PRIVATECLUB
+          COMMUNICATION
         </span>
 
-        <h1>Messages</h1>
+        <h1>
+          Messagerie
+        </h1>
 
         <p>
-          Vos conversations privées
+          Échangez avec les membres autorisés de PrivateClub.
         </p>
 
       </div>
 
 
-      <div class="search-box">
-
-        <span>🔎</span>
-
-        <input
-          type="text"
-          placeholder="Rechercher..."
-          [(ngModel)]="recherche"
-        >
-
-      </div>
+      <!-- MESSAGERIE -->
+      <section class="messagerie-container">
 
 
-      <div class="members-list">
+        <!-- LISTE DES MEMBRES -->
+        <div class="members-panel">
 
-        @for (
-          membre of membresFiltres;
-          track membre.id
-        ) {
+          <div class="members-header">
 
-          @if (peutContacter(membre.id)) {
+            <h2>
+              Conversations
+            </h2>
 
-            <button
-              class="member-item"
-              [class.active]="
-                idMembreSelectionne === membre.id
-              "
-              (click)="selectionnerMembre(membre.id)"
+            <input
+              class="search-box"
+              type="text"
+              [(ngModel)]="recherche"
+              placeholder="Rechercher un membre..."
             >
 
-              <div class="avatar">
-
-                {{ membre.nom.charAt(0) }}
-
-              </div>
+          </div>
 
 
-              <div class="member-details">
+          <div class="members-list">
 
-                <strong>
-                  {{ membre.nom }}
-                </strong>
+            @for (
+              membre of membresFiltres;
+              track membre.id
+            ) {
 
-                <span>
-                  {{ membre.role }}
-                </span>
+              @if (
+                peutAfficherMembre(membre)
+              ) {
 
-              </div>
+                <button
+                  class="member-item"
+                  [class.selected]="
+                    idMembreSelectionne === membre.id
+                  "
+                  (click)="selectionnerMembre(membre.id)"
+                >
+
+                  <div class="member-avatar">
+
+                    @if (membre.photo) {
+
+                      <img
+                        [src]="
+                          'http://localhost:3000' +
+                          membre.photo
+                        "
+                        [alt]="membre.nom"
+                      >
+
+                    } @else {
+
+                      {{
+                        membre.nom
+                          ?.charAt(0)
+                          ?.toUpperCase()
+                      }}
+
+                    }
+
+                  </div>
 
 
-              <span class="arrow">
-                ›
-              </span>
+                  <div class="member-info">
 
-            </button>
+                    <span class="member-name">
+                      {{ membre.nom }}
+                    </span>
 
-          }
+                    <span class="member-role">
+                      {{ membre.role }}
+                    </span>
 
-        }
-
-      </div>
-
-    </aside>
+                  </div>
 
 
-    <!-- CONVERSATION -->
+                  <!-- Indique qu'on ne peut pas répondre -->
+                  @if (
+                    !peutContacter(membre.id)
+                  ) {
 
-    <section class="conversation-panel">
+                    <span
+                      class="read-only-badge"
+                      title="Vous pouvez lire cette conversation mais vous ne pouvez pas répondre"
+                    >
+                      🔒
+                    </span>
 
-      @if (membreSelectionne) {
+                  }
 
-        <div class="conversation-header">
+                </button>
 
-          <div class="conversation-user">
+              }
 
-            <div class="avatar large">
-
-              {{ membreSelectionne.charAt(0) }}
-
-            </div>
-
-            <div>
-
-              <h2>
-                {{ membreSelectionne }}
-              </h2>
-
-              <span>
-                Conversation privée
-              </span>
-
-            </div>
+            }
 
           </div>
 
         </div>
 
 
-        <div class="message-area">
+        <!-- CONVERSATION -->
+        <div class="conversation-panel">
 
+          @if (
+            idMembreSelectionne !== null
+          ) {
 
-          @if (messageErreur !== '') {
+            <!-- HEADER -->
+            <div class="conversation-header">
 
-            <div class="message-error">
+              <div class="member-avatar">
 
-              {{ messageErreur }}
+                @if (
+                  getMembreSelectionne()?.photo
+                ) {
 
-            </div>
+                  <img
+                    [src]="
+                      'http://localhost:3000' +
+                      getMembreSelectionne()?.photo
+                    "
+                    [alt]="
+                      getMembreSelectionne()?.nom
+                    "
+                  >
 
-          }
+                } @else {
 
+                  {{
+                    getMembreSelectionne()
+                      ?.nom
+                      ?.charAt(0)
+                      ?.toUpperCase()
+                  }}
 
-          @if (messages.length === 0) {
+                }
 
-            <div class="empty-conversation">
-
-              <div class="empty-icon">
-                💬
               </div>
 
-              <h3>
-                Aucun message
-              </h3>
 
-              <p>
+              <div class="conversation-header-info">
 
-                Commencez la conversation avec
-                {{ membreSelectionne }}.
+                <strong>
+                  {{ getMembreSelectionne()?.nom }}
+                </strong>
 
-              </p>
+                <span>
+                  {{ getMembreSelectionne()?.role }}
+                </span>
+
+              </div>
 
             </div>
 
-          } @else {
 
-            @for (
-              message of messages;
-              track message.id
-            ) {
+            <!-- MESSAGES -->
+            <div class="message-area">
 
-              <div
-                class="message"
-                [class.my-message]="
-                  message.expediteur_id == idUtilisateur
-                "
-              >
+              @if (
+                messages.length === 0
+              ) {
 
-                <div class="message-header">
+                <div class="empty-conversation">
 
-                  <strong>
-                    {{ message.expediteur }}
-                  </strong>
+                  <div class="empty-conversation-icon">
+                    💬
+                  </div>
 
-                  <span>
-                    {{ message.date_envoi | date:'dd/MM/yyyy HH:mm' }}
-                  </span>
+                  <h2>
+                    Aucun message
+                  </h2>
+
+                  <p>
+                    Commencez la conversation.
+                  </p>
 
                 </div>
 
-                <p>
-                  {{ message.contenu }}
-                </p>
+              } @else {
+
+                @for (
+                  message of messages;
+                  track message.id
+                ) {
+
+                  <div
+                    class="message"
+                    [class.sent]="
+                      message.expediteur_id == idUtilisateur
+                    "
+                    [class.received]="
+                      message.expediteur_id != idUtilisateur
+                    "
+                  >
+
+                    @if (
+                      message.contenu
+                    ) {
+
+                      <div class="message-bubble">
+                        {{ message.contenu }}
+                      </div>
+
+                    }
+
+
+                    @if (
+                      message.fichier
+                    ) {
+
+                      <div
+                        class="message-file"
+                        (click)="
+                          ouvrirFichier(
+                            message.fichier
+                          )
+                        "
+                      >
+
+                        📎
+
+                        <span>
+                          {{
+                            message.nom_fichier ||
+                            'Fichier joint'
+                          }}
+                        </span>
+
+                      </div>
+
+                    }
+
+
+                    <span class="message-date">
+                      {{
+                        message.date_envoi
+                          | date:'dd/MM/yyyy HH:mm'
+                      }}
+                    </span>
+
+                  </div>
+
+                }
+
+              }
+
+            </div>
+
+
+            <!-- FICHIER SELECTIONNE -->
+            @if (
+              fichierSelectionne
+            ) {
+
+              <div class="file-selected">
+
+                <span>
+                  📎 {{ nomFichier }}
+                </span>
+
+                <button
+                  type="button"
+                  (click)="retirerFichier()"
+                >
+                  ✕
+                </button>
 
               </div>
 
             }
 
+
+            <!-- ZONE D'ECRITURE -->
+            @if (
+              peutContacter(
+                idMembreSelectionne
+              )
+            ) {
+
+              <div class="message-input">
+
+                <input
+                  #fichierMessage
+                  id="fichierMessage"
+                  type="file"
+                  hidden
+                  accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                  (change)="
+                    selectionnerFichier($event)
+                  "
+                >
+
+                <button
+                  type="button"
+                  class="file-button"
+                  (click)="
+                    fichierMessage.click()
+                  "
+                  title="Joindre un fichier"
+                >
+                  📎
+                </button>
+
+                <input
+                  type="text"
+                  [(ngModel)]="nouveauMessage"
+                  placeholder="Écrire un message..."
+                  (keyup.enter)="
+                    envoyerMessage()
+                  "
+                >
+
+                <button
+                  type="button"
+                  class="send-button"
+                  (click)="
+                    envoyerMessage()
+                  "
+                >
+                  Envoyer
+                  <span>➤</span>
+                </button>
+
+              </div>
+
+            } @else {
+
+              <div class="read-only-message">
+
+                🔒 Vous pouvez consulter cette conversation,
+                mais vous n'êtes pas autorisé à répondre.
+
+              </div>
+
+            }
+
+          } @else {
+
+            <div class="empty-conversation">
+
+              <div class="empty-conversation-icon">
+                💬
+              </div>
+
+              <h2>
+                Sélectionnez une conversation
+              </h2>
+
+              <p>
+                Choisissez un membre dans la liste pour commencer à discuter.
+              </p>
+
+            </div>
+
           }
 
         </div>
 
+      </section>
 
-        <!-- CHAMP D'ENVOI -->
+    </main>
 
-        @if (
-          idMembreSelectionne &&
-          peutContacter(idMembreSelectionne)
-        ) {
-
-          <div class="message-input">
-
-            <input
-              type="text"
-              placeholder="Écrire un message..."
-              [(ngModel)]="nouveauMessage"
-              (keyup.enter)="envoyerMessage()"
-            >
-
-            <button
-              (click)="envoyerMessage()">
-
-              Envoyer ➤
-
-            </button>
-
-          </div>
-
-        }
-
-      } @else {
-
-        <div class="no-conversation">
-
-          <div class="big-icon">
-            💬
-          </div>
-
-          <h2>
-            Vos messages
-          </h2>
-
-          <p>
-
-            Sélectionnez un membre pour commencer
-            une conversation.
-
-          </p>
-
-        </div>
-
-      }
-
-    </section>
-
-  </main>
+  </div>
 
 </div>

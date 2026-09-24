@@ -1,267 +1,1165 @@
+
+/* =========================================================
+   PAGE
+========================================================= */
+
 .annonces-page {
   min-height: 100vh;
   background: #f5f7fb;
-  color: #111;
+  color: #1f2937;
 }
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 40px;
-  background: white;
-  border-bottom: 1px solid #ddd;
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 235px;
+  height: 100vh;
+
+  background: #ffffff;
+
+  border-right: 1px solid #e5e7eb;
+
+  z-index: 1000;
 }
 
-.logo {
-  width: 130px;
-  height: auto;
-}
 
-.back-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  background: #111;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-}
+.sidebar-logo {
+  height: 100px;
 
-.content {
-  padding: 50px;
-}
-
-.content h1 {
-  margin-bottom: 10px;
-  font-size: 32px;
-}
-
-.content > p {
-  color: #666;
-}
-
-/* Zone de publication */
-
-.publication-box {
-  max-width: 700px;
-  margin-top: 30px;
-  padding: 22px;
-  background: white;
-  border: 1px solid #e6e9f0;
-  border-radius: 18px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
-}
-
-.publication-icon {
-  width: 55px;
-  height: 55px;
-  border-radius: 15px;
-  background: #111;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 25px;
-  flex-shrink: 0;
+
+  border-bottom: 1px solid #eeeeee;
 }
+
+
+.sidebar-logo img {
+  width: 145px;
+  max-height: 70px;
+
+  object-fit: contain;
+}
+
+
+.sidebar-nav {
+  padding: 24px 15px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+
+.sidebar-nav button {
+  width: 100%;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #4b5563;
+
+  padding: 13px 15px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+
+.sidebar-nav button:hover {
+  background: #f0f7f3;
+
+  color: #16833e;
+}
+
+
+.sidebar-nav button.active {
+  background: #16833e;
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   ZONE PRINCIPALE
+========================================================= */
+
+.main-area {
+  margin-left: 235px;
+
+  min-height: 100vh;
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.topbar {
+  height: 72px;
+
+  padding: 0 35px;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.topbar-label {
+  color: #16833e;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+
+.topbar-user {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  background: #f0f7f3;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 17px;
+}
+
+
+/* =========================================================
+   CONTENU
+========================================================= */
+
+.content {
+  width: calc(100% - 70px);
+
+  max-width: 1100px;
+
+  margin: 0 auto;
+
+  padding: 35px 0 50px;
+}
+
+
+/* =========================================================
+   BOUTON RETOUR
+========================================================= */
+
+.back-button {
+  border: none;
+
+  background: transparent;
+
+  color: #16833e;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  padding: 0;
+
+  margin-bottom: 25px;
+}
+
+
+.back-button:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================================================
+   HEADER PAGE
+========================================================= */
+
+.page-header {
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  padding: 28px 30px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 25px;
+
+  margin-bottom: 22px;
+}
+
+
+.page-label {
+  display: inline-block;
+
+  color: #16833e;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 1.4px;
+}
+
+
+.page-header h1 {
+  margin: 7px 0;
+
+  color: #111827;
+
+  font-size: 28px;
+
+  font-weight: 700;
+}
+
+
+.page-header p {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+
+.announcement-count {
+  min-width: 90px;
+
+  padding: 13px 17px;
+
+  background: #f0f7f3;
+
+  border-radius: 9px;
+
+  text-align: center;
+
+  color: #16833e;
+}
+
+
+.announcement-count strong {
+  display: block;
+
+  font-size: 24px;
+
+  line-height: 1.2;
+}
+
+
+.announcement-count span {
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.message {
+  padding: 12px 15px;
+
+  margin-bottom: 20px;
+
+  background: #fff4f4;
+
+  border: 1px solid #f0caca;
+
+  border-radius: 8px;
+
+  color: #b42318;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   BLOC ADMIN
+========================================================= */
+
+.publication-box {
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  padding: 20px 22px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 17px;
+
+  margin-bottom: 25px;
+}
+
+
+.publication-icon {
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
+
+  background: #f0f7f3;
+
+  border-radius: 9px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 21px;
+}
+
 
 .publication-info {
   flex: 1;
 }
 
-.publication-info h2 {
-  margin: 0 0 5px;
-  font-size: 19px;
+
+.publication-label {
+  color: #16833e;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 1px;
 }
+
+
+.publication-info h2 {
+  margin: 4px 0;
+
+  color: #111827;
+
+  font-size: 17px;
+}
+
 
 .publication-info p {
   margin: 0;
-  color: #777;
-  font-size: 14px;
+
+  color: #6b7280;
+
+  font-size: 13px;
 }
+
 
 .publish-button {
-  padding: 13px 20px;
   border: none;
-  border-radius: 10px;
-  background: #111;
-  color: white;
-  font-size: 14px;
-  font-weight: bold;
+
+  background: #16833e;
+
+  color: #ffffff;
+
+  padding: 11px 17px;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
   cursor: pointer;
+
+  white-space: nowrap;
 }
+
 
 .publish-button:hover {
-  opacity: 0.85;
+  background: #126d34;
 }
 
-/* Formulaire */
+
+/* =========================================================
+   FORMULAIRE
+========================================================= */
 
 .publication-form {
-  max-width: 700px;
-  margin-top: 20px;
-  padding: 28px;
-  background: white;
-  border-radius: 18px;
-  border: 1px solid #e6e9f0;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  padding: 25px;
+
+  margin-bottom: 25px;
 }
+
 
 .form-header {
   display: flex;
+
+  align-items: center;
+
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 22px;
+
+  margin-bottom: 20px;
 }
+
 
 .form-label {
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 1.5px;
-  color: #777;
+  color: #16833e;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 1px;
 }
+
 
 .form-header h2 {
-  margin: 6px 0 0;
-  font-size: 23px;
+  margin: 5px 0 0;
+
+  color: #111827;
+
+  font-size: 19px;
 }
+
 
 .form-icon {
-  font-size: 25px;
+  font-size: 24px;
 }
 
-.publication-form input,
+
+.publication-form input[type="text"],
 .publication-form textarea {
   width: 100%;
+
   box-sizing: border-box;
-  padding: 14px;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background: #fafafa;
-  font-family: inherit;
-  font-size: 14px;
+
+  padding: 12px 14px;
+
+  margin-bottom: 14px;
+
+  border: 1px solid #d9dee5;
+
+  border-radius: 7px;
+
   outline: none;
+
+  background: #ffffff;
+
+  color: #1f2937;
+
+  font-family: inherit;
+
+  font-size: 14px;
 }
 
+
+.publication-form input[type="text"]:focus,
+.publication-form textarea:focus {
+  border-color: #16833e;
+
+  box-shadow: 0 0 0 2px rgba(22, 131, 62, 0.08);
+}
+
+
 .publication-form textarea {
-  min-height: 140px;
+  min-height: 130px;
+
   resize: vertical;
 }
 
-.publication-form input:focus,
-.publication-form textarea:focus {
-  border-color: #111;
-  background: white;
+
+/* =========================================================
+   UPLOAD
+========================================================= */
+
+.file-upload {
+  margin-top: 2px;
 }
 
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
 
-.cancel-button,
-.submit-button {
-  padding: 12px 18px;
-  border-radius: 9px;
-  font-weight: bold;
+.file-button {
+  border: 1px solid #d9dee5;
+
+  background: #ffffff;
+
+  color: #374151;
+
+  padding: 10px 14px;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+
   cursor: pointer;
 }
 
-.cancel-button {
-  border: 1px solid #ddd;
-  background: white;
-  color: #555;
+
+.file-button:hover {
+  border-color: #16833e;
+
+  color: #16833e;
 }
+
+
+.file-selected {
+  max-width: 100%;
+
+  margin-top: 10px;
+
+  padding: 9px 11px;
+
+  background: #f0f7f3;
+
+  border: 1px solid #d7eadf;
+
+  border-radius: 7px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.file-name {
+  flex: 1;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  color: #374151;
+
+  font-size: 13px;
+}
+
+
+.remove-file {
+  border: none;
+
+  background: transparent;
+
+  color: #b42318;
+
+  font-size: 20px;
+
+  cursor: pointer;
+}
+
+
+.file-upload small {
+  display: block;
+
+  margin-top: 8px;
+
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.form-actions {
+  margin-top: 20px;
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+}
+
+
+.cancel-button {
+  border: 1px solid #d9dee5;
+
+  background: #ffffff;
+
+  color: #4b5563;
+
+  padding: 10px 17px;
+
+  border-radius: 7px;
+
+  cursor: pointer;
+}
+
 
 .submit-button {
   border: none;
-  background: #111;
-  color: white;
+
+  background: #16833e;
+
+  color: #ffffff;
+
+  padding: 10px 18px;
+
+  border-radius: 7px;
+
+  font-weight: 600;
+
+  cursor: pointer;
 }
 
-/* Annonces */
+
+.submit-button:hover {
+  background: #126d34;
+}
+
+
+/* =========================================================
+   SECTION
+========================================================= */
+
+.section-title {
+  margin: 30px 0 15px;
+}
+
+
+.section-title span {
+  color: #16833e;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 1.3px;
+}
+
+
+.section-title h2 {
+  margin: 5px 0 0;
+
+  color: #111827;
+
+  font-size: 20px;
+}
+
+
+/* =========================================================
+   LISTE DES ANNONCES
+========================================================= */
+
+.annonces-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+}
+
+
+/* =========================================================
+   CARTE
+========================================================= */
 
 .annonce-card {
-  max-width: 600px;
-  margin-top: 30px;
-  padding: 25px;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  padding: 22px 24px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.annonce-card h2 {
+
+.annonce-card:hover {
+  border-color: #d3e5d9;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+
+.annonce-top {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 15px;
+}
+
+
+.annonce-category {
+  color: #16833e;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.8px;
+}
+
+
+.delete-button {
+  border: none;
+
+  background: transparent;
+
+  font-size: 15px;
+
+  cursor: pointer;
+
+  opacity: 0.7;
+}
+
+
+.delete-button:hover {
+  opacity: 1;
+}
+
+
+/* =========================================================
+   STRUCTURE PRINCIPALE DE L'ANNONCE
+========================================================= */
+
+.annonce-main {
+  display: flex;
+
+  align-items: stretch;
+
+  gap: 20px;
+}
+
+
+/* =========================================================
+   APERCU DU FICHIER
+   A GAUCHE
+========================================================= */
+
+.attachment-box {
+  order: 1;
+
+  width: 280px;
+
+  min-height: 145px;
+
+  flex-shrink: 0;
+
+  background: #fafbfc;
+
+  border: 1px solid #e1e5e9;
+
+  border-radius: 9px;
+
+  padding: 10px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 9px;
+}
+
+
+.attachment-preview {
+  width: 100%;
+
+  height: 100px;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  border-radius: 6px;
+
+  background: #eef1f3;
+
+  border: 1px solid #e0e4e8;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+
+/* IMAGE */
+
+.attachment-preview img {
+  width: 100%;
+
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+
+/* PDF */
+
+.attachment-preview iframe {
+  width: 100%;
+
+  height: 100%;
+
+  border: none;
+
+  display: block;
+
+  pointer-events: none;
+}
+
+
+/* FICHIER CLASSIQUE */
+
+.file-preview {
+  width: 100%;
+
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-direction: column;
+
+  gap: 5px;
+
+  color: #6b7280;
+
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+
+.file-preview-icon {
+  font-size: 32px;
+}
+
+
+/* =========================================================
+   INFORMATIONS FICHIER
+========================================================= */
+
+.attachment-info {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.attachment-info strong {
+  color: #374151;
+
+  font-size: 12px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.attachment-info span {
+  color: #9ca3af;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   BOUTON FICHIER
+========================================================= */
+
+.attachment-button {
+  align-self: flex-start;
+
+  border: none;
+
+  background: #16833e;
+
+  color: #ffffff;
+
+  padding: 7px 11px;
+
+  border-radius: 6px;
+
+  font-size: 11px;
+
+  cursor: pointer;
+}
+
+
+.attachment-button:hover {
+  background: #126d34;
+}
+
+
+/* =========================================================
+   TEXTE DE L'ANNONCE
+   A DROITE DU FICHIER
+========================================================= */
+
+.annonce-text {
+  order: 2;
+
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 4px 0;
+}
+
+
+.annonce-text h2 {
+  margin: 0 0 12px;
+
+  color: #111827;
+
+  font-size: 20px;
+
+  line-height: 1.3;
+}
+
+
+.annonce-content {
+  margin: 0;
+
+  color: #5f6875;
+
+  font-size: 14px;
+
+  line-height: 1.7;
+
+  white-space: pre-wrap;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.annonce-footer {
+  margin-top: 18px;
+
+  padding-top: 13px;
+
+  border-top: 1px solid #eeeeee;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 20px;
+
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   AUCUNE ANNONCE
+========================================================= */
+
+.no-annonces {
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
+
+  padding: 55px 25px;
+
+  text-align: center;
+}
+
+
+.empty-icon {
   margin-bottom: 12px;
+
+  font-size: 35px;
 }
 
-.annonce-card p {
-  color: #555;
-  line-height: 1.6;
+
+.no-annonces h2 {
+  margin: 0 0 8px;
+
+  color: #111827;
+
+  font-size: 19px;
 }
 
-.annonce-card span {
-  display: inline-block;
-  margin-top: 15px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  background: #e8efff;
-  color: #315acb;
+
+.no-annonces p {
+  margin: 0 0 18px;
+
+  color: #6b7280;
+
   font-size: 13px;
-  font-weight: bold;
 }
 
-/* Téléphone */
 
-@media (max-width: 650px) {
+.empty-button {
+  border: none;
+
+  background: #16833e;
+
+  color: #ffffff;
+
+  padding: 10px 16px;
+
+  border-radius: 7px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .annonce-main {
+    flex-direction: column;
+  }
+
+
+  .attachment-box {
+    width: 100%;
+  }
+
+
+  .attachment-preview {
+    height: 170px;
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .sidebar {
+    position: relative;
+
+    width: 100%;
+
+    height: auto;
+  }
+
+
+  .annonces-page {
+    display: block;
+  }
+
+
+  .main-area {
+    margin-left: 0;
+  }
+
+
+  .sidebar-nav {
+    flex-direction: row;
+
+    flex-wrap: wrap;
+
+    padding: 10px;
+  }
+
+
+  .sidebar-nav button {
+    width: auto;
+
+    flex: 1 1 130px;
+
+    text-align: center;
+  }
+
+
   .content {
-    padding: 25px;
+    width: calc(100% - 36px);
+
+    padding: 25px 18px;
   }
 
-  .topbar {
-    padding: 15px 20px;
+
+  .page-header {
+    flex-direction: column;
+
+    align-items: flex-start;
   }
+
 
   .publication-box {
+    flex-direction: column;
+
     align-items: flex-start;
-    flex-wrap: wrap;
   }
+
 
   .publish-button {
     width: 100%;
   }
 
-  .form-actions {
+
+  .annonce-footer {
     flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 6px;
   }
 
-  .cancel-button,
-  .submit-button {
-    width: 100%;
-  }
-
-  .delete-button {
-  margin-top: 15px;
-  padding: 9px 14px;
-  border: none;
-  border-radius: 8px;
-  background: #111;
-  color: white;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
 }
 
-.delete-button:hover {
-  opacity: 0.8;
-  transform: translateY(-1px);
-}
-
-}

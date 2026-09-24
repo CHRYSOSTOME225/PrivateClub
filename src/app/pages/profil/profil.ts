@@ -34,6 +34,8 @@ export class Profil implements OnInit {
   matricule = '';
 
   photo = '';
+  fichierPhoto: File | null = null;
+messagePhoto = '';
 
   nouveauMotDePasse = '';
 
@@ -48,6 +50,8 @@ export class Profil implements OnInit {
   motDePasseMessage = '';
 
   idUtilisateur = 0;
+
+  roleUtilisateur = '';
 
 
   constructor(
@@ -496,6 +500,107 @@ export class Profil implements OnInit {
 
 
   // ===============================
+// SÉLECTIONNER UNE PHOTO
+// ===============================
+
+selectionnerPhoto(event: Event) {
+
+  const input =
+    event.target as HTMLInputElement;
+
+  if (!input.files || input.files.length === 0) {
+    return;
+  }
+
+  const fichier =
+    input.files[0];
+
+  const typesAutorises = [
+    'image/jpeg',
+    'image/png',
+    'image/webp'
+  ];
+
+  if (!typesAutorises.includes(fichier.type)) {
+
+    this.messagePhoto =
+      'Seules les images JPG, PNG et WEBP sont autorisées.';
+
+    return;
+  }
+
+  if (fichier.size > 5 * 1024 * 1024) {
+
+    this.messagePhoto =
+      'La photo ne doit pas dépasser 5 Mo.';
+
+    return;
+  }
+
+  this.fichierPhoto = fichier;
+
+  this.messagePhoto =
+    'Photo sélectionnée.';
+
+}
+
+
+// ===============================
+// ENVOYER LA PHOTO
+// ===============================
+
+envoyerPhoto() {
+
+  if (!this.fichierPhoto) {
+
+    this.messagePhoto =
+      'Veuillez sélectionner une photo.';
+
+    return;
+
+  }
+
+  this.api
+    .uploadPhotoProfil(
+      this.idUtilisateur,
+      this.fichierPhoto
+    )
+    .subscribe({
+
+      next: (resultat: any) => {
+
+        this.photo =
+          resultat.photo;
+
+        this.fichierPhoto =
+          null;
+
+        this.messagePhoto =
+          'Photo de profil mise à jour avec succès.';
+
+        this.chargerProfil();
+
+        this.cdr.detectChanges();
+
+      },
+
+      error: (erreur: any) => {
+
+        console.error(
+          'ERREUR UPLOAD PHOTO :',
+          erreur
+        );
+
+        this.messagePhoto =
+          'Impossible de mettre à jour la photo.';
+
+      }
+
+    });
+
+}
+
+  // ===============================
   // RETOUR DASHBOARD
   // ===============================
 
@@ -506,5 +611,25 @@ export class Profil implements OnInit {
     );
 
   }
+
+  allerAccueil() {
+  this.router.navigate(['/dashboard']);
+}
+
+allerMembres() {
+  this.router.navigate(['/membres']);
+}
+
+allerAnnonces() {
+  this.router.navigate(['/annonces']);
+}
+
+allerMessagerie() {
+  this.router.navigate(['/messagerie']);
+}
+
+allerAdministration() {
+  this.router.navigate(['/administration']);
+}
 
 }
