@@ -5,3 +5,8 @@ dist/
 .env
 **/.env
 backend/uploads/
+# Sauvegarde MySQL locale
+privateclub_backup.sql
+
+# Configuration locale VS Code
+.vscode/docs/
